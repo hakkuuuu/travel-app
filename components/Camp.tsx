@@ -30,11 +30,11 @@ const CampSite = ({backgroundImage, title, subtitle, peopleJoined}: CampProps) =
 
         <div className="flexCenter gap-6">
           <span className="flex -space-x-3 overflow-hidden">
-            {PEOPLE_URL.map((url) => (
+            {PEOPLE_URL.map((url, idx) => (
               <Image
               className="inline-block h-10 w-10 rounded-full"
               src={url}
-              key={url}
+              key={url || idx}
               alt='avatars'
               width={52}
               height={52}

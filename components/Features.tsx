@@ -29,10 +29,10 @@ const Features = () => {
             </div>
 
             <ul className='mt-10 grid gap-10 md:grid-cols-2 lg:mg-20 lg:gap-20'>
-              {FEATURES.map((feature) => (
+              {FEATURES.map((feature, idx) => (
                 <FeatureItem  
                 title={feature.title} 
-                key={feature.title}
+                key={feature.id || idx}
                 icon={feature.icon}
                 description={feature.description}/>
               ))}

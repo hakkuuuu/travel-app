@@ -6,7 +6,7 @@ import React from 'react'
 
 const Footer = () => {
   return (
-    <footer className='flexCenter mb-24'>
+    <footer className='flexCenter pt-14 pb-10'>
       <div className='padding-container max-container flex w-full flex-col gap-14'>
         <div className='flex flex-col items-start justify-center gap-[10%] m:flex-row'>
           <Link href={'/'} className='mb-10'>
@@ -14,23 +14,24 @@ const Footer = () => {
           </Link>
 
           <div className='flex flex-wrap gap-10 sm:justify-between md:flex-1'>
-            {FOOTER_LINKS.map((columns) => (
-              <FooterColumn title={columns.title}>
+            {FOOTER_LINKS.map((columns, idx) => (
+              <FooterColumn title={columns.title} key={columns.title || idx}>
                 <ul className='regular-14 flex flex-col gap-4 text-gray-30'>
-                  {columns.links.map((link) =>
-                  <Link href={'/'} key={link}>
-                    {link}
-                  </Link>)}
+                  {columns.links.map((link, linkIdx) => (
+                    <Link href={'/'} key={link || linkIdx}>
+                      {link}
+                    </Link>
+                  ))}
                 </ul>
               </FooterColumn>
             ))}
 
             <div className='flex flex-col'>
               <FooterColumn title={FOOTER_CONTACT_INFO.title}>
-                {FOOTER_CONTACT_INFO.links.map((link) => (
+                {FOOTER_CONTACT_INFO.links.map((link, idx) => (
                   <Link
                   href={'/'}
-                  key={link.label}
+                  key={link.label || idx}
                   className='flex gap-4 md:flex-col lg:flex-row'>
                   <p className='whitespace-nowrap'>
                     {link.label}:
@@ -46,8 +47,8 @@ const Footer = () => {
             <div className='flex flex-col gap-5'>
               <FooterColumn title={SOCIALS.title}>
                 <ul className='regular-14 flex gap-4 text-gray-30'>
-                  {SOCIALS.links.map((link) => (
-                    <Link href={'/'} key={link}>
+                  {SOCIALS.links.map((link, idx) => (
+                    <Link href={'/'} key={link || idx}>
                       <Image src={link} alt='logo' width={24} height={24}/>
                     </Link>
                   ))}

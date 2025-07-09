@@ -1,12 +1,29 @@
+"use client";
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from './Button'
 
 const Hero = () => {
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('loggedIn') === 'true';
+    if (isLoggedIn) {
+      setUsername(localStorage.getItem('username') || "");
+    } else {
+      setUsername("");
+    }
+  }, []);
+
   return (
     <section className='max-container padding-container flex flex-col gap-20 py-10 pb-32 md:gap-28 lg:py-20 xl:flex-row'>
 
       <div className='relative z-20 flex flex-1 flex-col xl:w-1/2'>
+        {username ? (
+          <h2 className='text-lg text-green-700 mb-2'>Hello, {username}! 👋</h2>
+        ) : (
+          <h2 className='text-lg text-green-700 mb-2'>Welcome, Guest!</h2>
+        )}
 
         <h1 className='bold-52 lg:bold-88'>Islang Pantropiko Camp Area</h1>
         <p className='regular-16 mt-6 text-gray-50 xl:max-w-[520px]'>From following your footprints in the sand to walking with you on this island, guided by the grip of your hand I can feel you're holding my world</p>
@@ -14,13 +31,14 @@ const Hero = () => {
         <div className='my-12 flex flex-wrap gap-5'>
           <div className='flex items-center gap-2'>
             {Array(5).fill(1).map((_, index) => (
-              <Image
-                src='/star.svg'
-                alt='star'
-                key={index}
-                width={24}
-                height={24}
-                />
+              <div key={index}>
+                <Image
+                  src='/star.svg'
+                  alt='star'
+                  width={24}
+                  height={24}
+                  />
+              </div>
             ))}
           </div>
 
