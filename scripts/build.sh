@@ -15,7 +15,7 @@ fi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm ci --only=production --legacy-peer-deps
+npm ci --legacy-peer-deps
 
 # Build the application
 echo "🔨 Building the application..."

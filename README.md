@@ -4,7 +4,7 @@ A modern travel booking application built with Next.js, featuring destination di
 
 ## 🚀 Railway Deployment
 
-This project is configured for easy deployment on Railway. Follow these steps to deploy:
+This project is configured for easy deployment on Railway using Docker. Follow these steps to deploy:
 
 ### Prerequisites
 - Railway account
@@ -26,26 +26,70 @@ This project is configured for easy deployment on Railway. Follow these steps to
    - Click "New Project"
    - Select "Deploy from GitHub repo"
    - Choose your repository
-   - Railway will automatically detect the configuration
+   - Railway will automatically detect the Docker configuration
 
-3. **Environment Variables** (if needed)
-   - Add any required environment variables in Railway dashboard
-   - Common variables:
+3. **Environment Variables**
+   - Add required environment variables in Railway dashboard:
      - `NODE_ENV=production`
-     - `NEXT_PUBLIC_API_URL=your-api-url`
+     - `DEBUG=false` (for production)
+     - `MONGODB_URI=your-mongodb-connection-string`
+     - `RAILWAY_STATIC_URL=your-railway-app-url`
+     - `RAILWAY_PUBLIC_DOMAIN=your-railway-domain`
 
 4. **Automatic Deployment**
-   - Railway will automatically build and deploy your app
+   - Railway will automatically build and deploy your app using Docker
    - Each push to main branch triggers a new deployment
 
 ### Build Configuration
 
 The project includes several deployment configurations:
 
-- **`railway.json`** - Railway-specific configuration
-- **`.nixpacks.toml`** - Nixpacks build configuration
-- **`Dockerfile`** - Alternative Docker deployment
-- **`scripts/build.sh`** - Custom build script
+- **`railway.json`** - Railway-specific configuration with Docker
+- **`Dockerfile`** - Multi-stage Docker build for production
+- **`docker-compose.yml`** - Local development with Docker
+- **`.dockerignore`** - Optimized Docker build context
+
+## 🔧 Environment Configuration
+
+### DEBUG Mode
+
+The application supports DEBUG mode for development:
+
+```bash
+# Development (DEBUG mode enabled)
+DEBUG=true npm run dev
+
+# Production (DEBUG mode disabled)
+DEBUG=false npm start
+```
+
+**DEBUG Mode Features:**
+- Allows localhost and 127.0.0.1 as allowed hosts
+- Enables detailed logging
+- Relaxed security for local development
+
+**Production Mode Features:**
+- Restricts allowed hosts to Railway domains
+- Optimized for production performance
+- Enhanced security measures
+
+### Docker Development
+
+Run the application locally using Docker:
+
+```bash
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
 
 ### Local Development
 
@@ -69,7 +113,8 @@ npm start
 - **Styling**: Tailwind CSS
 - **Authentication**: Custom Auth Context
 - **Database**: MongoDB (configured)
-- **Deployment**: Railway
+- **Deployment**: Railway with Docker
+- **Containerization**: Docker & Docker Compose
 
 ## 📁 Project Structure
 
@@ -83,8 +128,12 @@ travel-app/
 ├── components/            # Reusable components
 ├── contexts/              # React contexts
 ├── lib/                   # Utility libraries
+│   └── config.ts         # Environment configuration
 ├── public/                # Static assets
-└── scripts/               # Build scripts
+├── scripts/               # Build scripts
+├── Dockerfile            # Production Docker build
+├── docker-compose.yml    # Local development
+└── .dockerignore         # Docker build optimization
 ```
 
 ## 🔧 Available Scripts
