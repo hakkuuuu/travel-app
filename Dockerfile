@@ -2,7 +2,7 @@
 FROM node:20-alpine AS base
 
 # Accept build arguments
-ARG MONGODB_URI
+ARG MONGODB_URI=mongodb://localhost:27017/travel-app
 
 # Install dependencies only when needed
 FROM base AS deps
