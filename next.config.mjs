@@ -14,11 +14,6 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   
-  // Enable experimental features for better performance
-  experimental: {
-    optimizeCss: true,
-  },
-  
   // Compiler options
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

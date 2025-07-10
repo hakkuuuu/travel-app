@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-// Remove: import { getMockDestinationById, Destination, Review } from '../mock/destinations';
 
 interface Destination {
   id: number;
@@ -28,7 +27,7 @@ interface Review {
   date: string;
 }
 
-function DestinationDetailContent({ params }: { params: { id: string } }) {
+function DestinationDetailContent({ params }: { params: Promise<{ id: string }> }) {
   const [destination, setDestination] = useState<Destination | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,15 +35,26 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
   const [nights, setNights] = useState(1);
   const [guests, setGuests] = useState(1);
   const [isBooking, setIsBooking] = useState(false);
+  const [id, setId] = useState<string>('');
   const { user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    async function getParams() {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    }
+    getParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (!id) return;
+    
     async function fetchDestination() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/destinations?id=${params.id}`);
+        const res = await fetch(`/api/destinations?id=${id}`);
         if (!res.ok) throw new Error('Destination not found');
         const data = await res.json();
         setDestination(data);
@@ -55,7 +65,7 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
       }
     }
     fetchDestination();
-  }, [params.id]);
+  }, [id]);
 
   const totalPrice = parseInt(destination?.price.replace('$', '').replace('/night', '') || '0') * nights;
 
@@ -204,13 +214,9 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
                           </div>
                         </div>
                       </div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(review.date).toLocaleDateString()}
-                      </span>
+                      <span className="text-sm text-gray-500">{review.date}</span>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300">
-                      {review.comment}
-                    </p>
+                    <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -220,11 +226,11 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg sticky top-8">
-              <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                   {destination?.price}
-                </div>
-                <div className="text-gray-600 dark:text-gray-400">per night</div>
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">per night</p>
               </div>
 
               <form onSubmit={handleBooking} className="space-y-4">
@@ -236,7 +242,8 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                     required
                   />
                 </div>
@@ -247,11 +254,11 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
                   </label>
                   <select
                     value={nights}
-                    onChange={(e) => setNights(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    onChange={(e) => setNights(Number(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   >
-                    {[1, 2, 3, 4, 5, 6, 7].map(num => (
-                      <option key={num} value={num}>{num} night{num > 1 ? 's' : ''}</option>
+                    {[1, 2, 3, 4, 5, 6, 7].map(n => (
+                      <option key={n} value={n}>{n} night{n !== 1 ? 's' : ''}</option>
                     ))}
                   </select>
                 </div>
@@ -262,48 +269,40 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
                   </label>
                   <select
                     value={guests}
-                    onChange={(e) => setGuests(parseInt(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    onChange={(e) => setGuests(Number(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   >
-                    {[1, 2, 3, 4, 5, 6].map(num => (
-                      <option key={num} value={num}>{num} guest{num > 1 ? 's' : ''}</option>
+                    {[1, 2, 3, 4, 5, 6].map(g => (
+                      <option key={g} value={g}>{g} guest{g !== 1 ? 's' : ''}</option>
                     ))}
                   </select>
                 </div>
 
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="border-t pt-4">
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-700 dark:text-gray-300">
-                      {destination?.price} × {nights} night{nights > 1 ? 's' : ''}
+                    <span className="text-gray-600 dark:text-gray-400">
+                      ${parseInt(destination?.price.replace('$', '').replace('/night', '') || '0')} × {nights} nights
                     </span>
-                    <span className="text-gray-900 dark:text-gray-100 font-semibold">
-                      ${totalPrice}
-                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">${totalPrice}</span>
                   </div>
-                  <div className="flex justify-between mb-4">
-                    <span className="text-gray-700 dark:text-gray-300">Service fee</span>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-600 dark:text-gray-400">Service fee</span>
                     <span className="text-gray-900 dark:text-gray-100">$5</span>
                   </div>
-                  <div className="flex justify-between text-lg font-bold text-gray-900 dark:text-gray-100">
-                    <span>Total</span>
-                    <span>${totalPrice + 5}</span>
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span className="text-gray-900 dark:text-gray-100">Total</span>
+                    <span className="text-gray-900 dark:text-gray-100">${totalPrice + 5}</span>
                   </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isBooking}
-                  className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
                 >
-                  {isBooking ? 'Processing...' : 'Reserve Now'}
+                  {isBooking ? 'Booking...' : 'Book Now'}
                 </button>
               </form>
-
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  You won't be charged yet
-                </p>
-              </div>
             </div>
           </div>
         </div>
@@ -312,7 +311,7 @@ function DestinationDetailContent({ params }: { params: { id: string } }) {
   );
 }
 
-export default function DestinationDetailPage({ params }: { params: { id: string } }) {
+export default function DestinationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   return (
     <ProtectedRoute>
       <DestinationDetailContent params={params} />
