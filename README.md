@@ -34,3 +34,38 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Design System & Component Usage
+
+### Button Component
+- All buttons (login, profile, actions) use the unified `Button` component in `components/Button.tsx`.
+- Supports variants: `primary` (green), `secondary` (white), `outline` (bordered).
+- Supports icon placement (left/right), sizes (`sm`, `md`, `lg`), and full width.
+- Example:
+  ```tsx
+  <Button variant="primary" size="md" icon={<UserIcon />} iconPosition="left">Profile</Button>
+  ```
+
+### ProfileDropdown
+- Uses the `Button` component for the profile trigger, passing avatar and username as props.
+- Dropdown menu for profile actions (view, settings, logout).
+
+### Theme Handling
+- Uses Tailwind's `dark:` variant for all color adaptation.
+- Theme is toggled via the `ThemeSwitch` component and stored in localStorage.
+- The `dark` class is applied to `<html>` for dark mode.
+
+### Global Styles
+- Only project-wide utility classes are kept in `app/globals.css` (e.g., `.max-container`, `.padding-container`, `.navlink`, `.travel-logo`, `.hide-scrollbar`).
+- All other styling is handled by Tailwind utility classes or config.
+
+### Image & Asset Management
+- All images in `public/` are referenced in the codebase. Unused images are regularly removed.
+- Use `next/image` for all images for optimization.
+
+### Best Practices
+- Use Tailwind utility classes for layout, color, and spacing.
+- Keep components small, focused, and reusable.
+- Document new components and utilities in this README for team onboarding.
+
+---
