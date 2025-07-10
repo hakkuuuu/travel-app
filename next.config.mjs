@@ -21,6 +21,17 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+
+  // Webpack configuration for path resolution
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Ensure proper module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname),
+    };
+    
+    return config;
+  },
 };
 
 export default nextConfig;
