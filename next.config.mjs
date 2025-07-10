@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import path from 'path';
+
 const nextConfig = {
   // Enable standalone output for Railway deployment
   output: 'standalone',
@@ -14,9 +16,6 @@ const nextConfig = {
     optimizeCss: true,
   },
   
-  // Disable telemetry in production
-  telemetry: false,
-  
   // Compiler options
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
@@ -27,7 +26,7 @@ const nextConfig = {
     // Ensure proper module resolution
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': require('path').resolve(__dirname),
+      '@': path.resolve(__dirname),
     };
     
     return config;
