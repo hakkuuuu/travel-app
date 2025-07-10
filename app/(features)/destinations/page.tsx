@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -66,7 +66,7 @@ export default function DestinationsPage() {
         </p>
       </div>
       {/* Destinations Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
         {filteredDestinations.map((destination: Destination) => (
           <div key={destination.id} className="card group overflow-hidden animate-fade-in">
             {/* Image */}
@@ -117,7 +117,7 @@ export default function DestinationsPage() {
       </div>
       {/* Empty State */}
       {filteredDestinations.length === 0 && (
-        <div className="text-center py-24">
+        <div className="text-center py-24 mb-16">
           <p className="text-gray-500 text-lg mb-4">No destinations found matching your criteria.</p>
           <button
             onClick={() => {

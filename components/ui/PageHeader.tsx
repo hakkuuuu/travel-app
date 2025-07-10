@@ -13,12 +13,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   className
 }) => {
   return (
-    <div className={cn('text-center mb-8', className)}>
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-green-600 mb-4">
+    <div className={cn('text-center mb-16', className)}>
+      <h1 className="section-title">
         {title}
       </h1>
       {subtitle && (
-        <p className="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto">
+        <p className="section-subtitle max-w-xl mx-auto text-center mt-4">
           {subtitle}
         </p>
       )}

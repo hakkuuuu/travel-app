@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 // Remove: import { getMockDestinationById, Destination, Review } from '../mock/destinations';

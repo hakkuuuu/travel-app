@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
       password 
     });
     if (user) {
+      // Debug: print user credentials
+      console.log('User login:', { username: user.username, email: user.email, role: user.role });
       // Create response with success
       const response = NextResponse.json({ 
         success: true, 

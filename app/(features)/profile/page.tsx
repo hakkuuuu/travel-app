@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { UserProfile, UserStats, RecentActivity } from '@/constants';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -146,27 +147,25 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-green-600 mb-2">
-            My Profile
-          </h1>
-            <p className="text-gray-600">Manage your account settings and preferences</p>
-        </div>
+            <h1 className="section-title">My Profile</h1>
+            <p className="section-subtitle mb-0">Manage your account settings and preferences</p>
+          </div>
           {!isEditing ? (
-          <Button
-            variant="primary"
-            className="mt-4 sm:mt-0"
+            <Button
+              variant="primary"
+              className="mt-4 sm:mt-0"
               onClick={() => setIsEditing(true)}
             >
               <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               Edit Profile
-          </Button>
+            </Button>
           ) : (
             <div className="mt-4 sm:mt-0 space-x-3">
-            <Button
-              variant="primary"
-              disabled={saving}
+              <Button
+                variant="primary"
+                disabled={saving}
                 onClick={handleSave}
               >
                 {saving ? (
@@ -185,13 +184,13 @@ export default function ProfilePage() {
                     Save Changes
                   </>
                 )}
-            </Button>
-            <Button
-              variant="secondary"
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={handleCancel}
               >
                 Cancel
-            </Button>
+              </Button>
             </div>
           )}
         </div>

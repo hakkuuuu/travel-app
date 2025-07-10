@@ -20,10 +20,8 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-green-600 mb-2">
-            Settings
-          </h1>
-          <p className="text-gray-600">Manage your account settings and preferences</p>
+          <h1 className="section-title">Settings</h1>
+          <p className="section-subtitle mb-0">Manage your account settings and preferences</p>
         </div>
         <Button
           variant="primary"

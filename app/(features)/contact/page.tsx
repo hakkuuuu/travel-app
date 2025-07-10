@@ -1,122 +1,186 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
+import Icon from '@/components/ui/Icon';
 
 const contactCards = [
   {
-    icon: (
-      <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
+    icon: 'email',
     title: 'Email Support',
-    description: 'Reach us anytime at support@travelis.com for help or feedback.'
+    description: 'support@travelis.com'
   },
   {
-    icon: (
-      <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-      </svg>
-    ),
+    icon: 'phone',
     title: 'Phone',
-    description: '+1 (555) 123-4567 (Mon-Fri, 9am-5pm)'
+    description: '+1 (555) 123-4567'
   },
   {
-    icon: (
-      <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    ),
+    icon: 'location',
     title: 'Office',
-    description: '123 Adventure St, Nature City, NC 12345, United States'
-  },
-  {
-    icon: (
-      <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-      </svg>
-    ),
-    title: 'Contact Form',
-    description: 'Use the form below to send us a message directly from the website.'
-  },
+    description: '123 Adventure St, Nature City, NC 12345'
+  }
 ];
 
 export default function ContactPage() {
-  // Placeholder for success message
-  const [success, setSuccess] = React.useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccess(true);
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setError(data.error || 'Failed to send message');
+      }
+    } catch (err) {
+      setError('Failed to send message. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4">
-      <h1 className="text-3xl sm:text-4xl font-extrabold text-green-700 mb-2 text-center">Contact Us</h1>
-      <p className="text-lg text-gray-700 mb-8 text-center">
-        Have a question, suggestion, or just want to say hello? We’d love to hear from you!
-      </p>
+    <div className="max-w-7xl mx-auto py-8 px-6">
+      <div className="text-center mb-12">
+        <h1 className="section-title">Contact Us</h1>
+        <p className="section-subtitle max-w-xl mx-auto text-center mt-4">
+          Get in touch with our team
+        </p>
+      </div>
 
-      {/* Contact Options Section */}
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">How to Reach Us</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-        {contactCards.map((card, idx) => (
-          <div key={idx} className="bg-white rounded-xl shadow p-6 flex flex-col items-center text-center border-t-4 border-green-100 hover:border-green-400 transition-all animate-fade-in h-full">
-            <div className="mb-3">{card.icon}</div>
-            <h3 className="text-base font-bold mb-1 text-gray-900">{card.title}</h3>
-            <p className="text-gray-600 text-sm">{card.description}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Column - How to Reach Us */}
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">How to Reach Us</h2>
+            <div className="space-y-4">
+              {contactCards.map((card, idx) => (
+                <div key={idx} className="flex items-center space-x-4 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                  <div className="flex-shrink-0">
+                    <Icon name={card.icon} size="lg" className="text-green-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
+                    <p className="text-gray-600">{card.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
 
-      {/* Divider */}
-      <div className="w-full flex justify-center my-8">
-        <div className="h-1 w-16 bg-gradient-to-r from-green-400 to-blue-400 rounded-full opacity-60" />
-      </div>
+          <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-3">Business Hours</h3>
+            <div className="space-y-2 text-gray-600">
+              <p><span className="font-medium">Monday - Friday:</span> 9:00 AM - 6:00 PM</p>
+              <p><span className="font-medium">Saturday:</span> 10:00 AM - 4:00 PM</p>
+              <p><span className="font-medium">Sunday:</span> Closed</p>
+            </div>
+          </div>
+        </div>
 
-      {/* Contact Form Section */}
-      <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">Send Us a Message</h2>
-      {success && (
-        <div className="mb-4 text-green-700 bg-green-100 border border-green-200 rounded-lg px-4 py-3 text-center">
-          Thank you for reaching out! We’ll get back to you soon.
-        </div>
-      )}
-      <form
-        className="bg-white rounded-xl shadow p-8 space-y-6 animate-fade-in"
-        onSubmit={e => {
-          e.preventDefault();
-          setSuccess(true);
-        }}
-      >
+        {/* Right Column - Contact Form */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-          <input
-            type="text"
-            className="input-field focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all duration-200"
-            placeholder="Enter your name"
-            required
-          />
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
+            
+            {success && (
+              <div className="mb-6 text-green-700 bg-green-100 border border-green-200 rounded-lg px-4 py-3 text-center">
+                Thank you for reaching out! We'll get back to you soon.
+              </div>
+            )}
+            
+            {error && (
+              <div className="mb-6 text-red-700 bg-red-100 border border-red-200 rounded-lg px-4 py-3 text-center">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter your name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                  placeholder="you@email.com"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                  rows={5}
+                  placeholder="How can we help you?"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-green-600 hover:to-blue-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </div>
+                ) : (
+                  'Send Message'
+                )}
+              </button>
+            </form>
+          </div>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input
-            type="email"
-            className="input-field focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all duration-200"
-            placeholder="you@email.com"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-          <textarea
-            className="input-field focus:ring-2 focus:ring-green-400 focus:border-green-400 transition-all duration-200"
-            rows={4}
-            placeholder="How can we help you?"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="btn-primary w-full hover:scale-105 focus:ring-2 focus:ring-green-400 transition-all duration-200"
-        >
-          Send Message
-        </button>
-      </form>
+      </div>
     </div>
   );
 } 

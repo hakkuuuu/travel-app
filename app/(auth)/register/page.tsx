@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import Icon from '@/components/ui/Icon';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -15,7 +16,28 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Redirect logged-in users away from register page
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  // Show loading while checking auth status
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  // Don't render the form if user is authenticated
+  if (isAuthenticated) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +52,7 @@ export default function RegisterPage() {
 
     try {
       const success = await register(formData.username, formData.email, formData.password);
-      if (success) {
-        window.location.href = '/profile'; // Redirect after registration
-      } else {
+      if (!success) {
         setError('Registration failed. Username or email might already exist.');
       }
     } catch (err) {
@@ -55,9 +75,7 @@ export default function RegisterPage() {
       {/* Header */}
       <div className="text-center">
         <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-large mb-6">
-          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-          </svg>
+          <Icon name="user-plus" size="xl" className="text-white" />
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Join Travelis</h2>
         <p className="text-gray-600">Create your account and start exploring</p>

@@ -54,7 +54,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
 
   const handleAdminPanel = () => {
     setIsOpen(false);
-    router.push('/admin/destinations');
+    router.push('/admin');
   };
 
   return (
@@ -97,6 +97,18 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
               View Profile
             </button>
             
+            {user.role === 'admin' && (
+              <button
+                onClick={handleAdminPanel}
+                className="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50 hover:text-green-900 transition-colors flex items-center"
+              >
+                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Admin Dashboard
+              </button>
+            )}
+            
             <button
               onClick={handleSettings}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors flex items-center"
@@ -107,17 +119,6 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
               </svg>
               Settings
             </button>
-            {user.role === 'admin' && (
-              <button
-                onClick={handleAdminPanel}
-                className="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50 hover:text-green-900 transition-colors flex items-center"
-              >
-                <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18" />
-                </svg>
-                Admin Panel
-              </button>
-            )}
           </div>
           
           <div className="border-t border-gray-100 pt-1">
