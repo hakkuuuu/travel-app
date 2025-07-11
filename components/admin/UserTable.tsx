@@ -46,8 +46,8 @@ export default function UserTable({ users, onEdit, onDelete, isLoading, onSort, 
             </tr>
           </thead>
           <tbody>
-            {users.map(user => (
-              <tr key={user.id} className="border-t border-gray-50">
+            {users.map((user, idx) => (
+              <tr key={user.id ?? idx} className="border-t border-gray-50">
                 <td className="px-6 py-3 text-sm text-gray-900 font-medium align-middle">{user.username}</td>
                 <td className="px-6 py-3 text-sm text-gray-700 align-middle">{user.email}</td>
                 <td className="px-6 py-3 text-sm text-gray-700 align-middle">{user.role || 'user'}</td>
