@@ -1,4 +1,5 @@
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaEdit, FaTrash, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export interface User {
   id: number;
@@ -19,11 +20,25 @@ interface UserTableProps {
 }
 
 export default function UserTable({ users, onEdit, onDelete, isLoading, onSort, sortKey, sortDirection }: UserTableProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Calculate pagination
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = users.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const renderSortIcon = (key: keyof User) => {
     if (!onSort) return null;
     if (sortKey !== key) return <span className="ml-1 text-gray-300">⇅</span>;
     return sortDirection === 'asc' ? <span className="ml-1">▲</span> : <span className="ml-1">▼</span>;
   };
+
   return (
     <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
       <h2 className="text-2xl font-bold mb-4 text-gray-900">All Users</h2>
@@ -46,7 +61,7 @@ export default function UserTable({ users, onEdit, onDelete, isLoading, onSort, 
             </tr>
           </thead>
           <tbody>
-            {users.map((user, idx) => (
+            {currentUsers.map((user, idx) => (
               <tr key={user.id ?? idx} className="border-t border-gray-50">
                 <td className="px-6 py-3 text-sm text-gray-900 font-medium align-middle">{user.username}</td>
                 <td className="px-6 py-3 text-sm text-gray-700 align-middle">{user.email}</td>
@@ -77,6 +92,51 @@ export default function UserTable({ users, onEdit, onDelete, isLoading, onSort, 
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-sm text-gray-700">
+            Showing {startIndex + 1} to {Math.min(endIndex, users.length)} of {users.length} users
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-2 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Previous page"
+            >
+              <FaChevronLeft />
+            </button>
+            
+            {/* Page numbers */}
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-3 py-1 rounded text-sm font-medium ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Next page"
+            >
+              <FaChevronRight />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

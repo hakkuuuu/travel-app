@@ -6,6 +6,7 @@ import DestinationForm from '@/components/admin/DestinationForm';
 import DestinationList from '@/components/admin/DestinationList';
 import UserForm from '@/components/admin/UserForm';
 import UserTable, { User } from '@/components/admin/UserTable';
+import Modal from '@/components/ui/Modal';
 
 interface Destination {
   id: number;
@@ -29,6 +30,7 @@ export default function AdminPage() {
   const [destinationLoading, setDestinationLoading] = useState(false);
   const [destinationError, setDestinationError] = useState<string | null>(null);
   const [destinationSuccess, setDestinationSuccess] = useState<string | null>(null);
+  const [showDestinationForm, setShowDestinationForm] = useState(false);
 
   // Users state
   const [users, setUsers] = useState<User[]>([]);
@@ -37,6 +39,7 @@ export default function AdminPage() {
   const [userSuccess, setUserSuccess] = useState<string | null>(null);
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showUserForm, setShowUserForm] = useState(false);
 
   // Fetch data based on tab
   useEffect(() => {
@@ -79,6 +82,7 @@ export default function AdminPage() {
       if (!res.ok) throw new Error("Failed to add destination");
       setDestinationSuccess("Destination added!");
       fetchDestinations();
+      setShowDestinationForm(false);
     } catch (e) {
       setDestinationError("Failed to add destination");
     } finally {
@@ -115,6 +119,7 @@ export default function AdminPage() {
       if (!res.ok) throw new Error("Failed to add user");
       setUserSuccess("User added!");
       fetchUsers();
+      setShowUserForm(false);
     } catch (e) {
       setUserError("Failed to add user");
     } finally {
@@ -143,6 +148,7 @@ export default function AdminPage() {
       setEditingUserId(null);
       setEditingUser(null);
       fetchUsers();
+      setShowUserForm(false);
     } catch (e) {
       setUserError("Failed to update user");
     } finally {
@@ -253,20 +259,30 @@ export default function AdminPage() {
           <div className="space-y-8">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">Destinations</h2>
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
-                onClick={fetchDestinations}
-                disabled={destinationLoading}
-              >
-                {destinationLoading ? 'Refreshing...' : 'Refresh'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
+                  onClick={() => setShowDestinationForm(true)}
+                >
+                  + Add Destination
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
+                  onClick={fetchDestinations}
+                  disabled={destinationLoading}
+                >
+                  {destinationLoading ? 'Refreshing...' : 'Refresh'}
+                </button>
+              </div>
             </div>
-            <DestinationForm 
-              onSubmit={handleDestinationSubmit}
-              isLoading={destinationLoading}
-              error={destinationError}
-              success={destinationSuccess}
-            />
+            <Modal isOpen={showDestinationForm} onClose={() => setShowDestinationForm(false)} title="Add Destination">
+              <DestinationForm
+                onSubmit={handleDestinationSubmit}
+                isLoading={destinationLoading}
+                error={destinationError}
+                success={destinationSuccess}
+              />
+            </Modal>
             <DestinationList 
               destinations={destinations}
               isLoading={destinationLoading}
@@ -278,15 +294,35 @@ export default function AdminPage() {
         {/* Users Tab */}
         {tab === 'users' && (
           <div className="space-y-8">
-            <UserForm 
-              onSubmit={editingUserId ? handleUserUpdate : handleUserSubmit}
-              onCancel={handleUserCancel}
-              isLoading={userLoading}
-              error={userError}
-              success={userSuccess}
-              editingUser={editingUser}
-            />
-            <UserTable 
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Users</h2>
+              <div className="flex gap-2">
+                <button
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
+                  onClick={() => { setEditingUser(null); setEditingUserId(null); setUserError(null); setUserSuccess(null); setShowUserForm(true); }}
+                >
+                  + Add User
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
+                  onClick={fetchUsers}
+                  disabled={userLoading}
+                >
+                  {userLoading ? 'Refreshing...' : 'Refresh'}
+                </button>
+              </div>
+            </div>
+            <Modal isOpen={showUserForm || editingUser !== null} onClose={() => { setShowUserForm(false); setEditingUser(null); setEditingUserId(null); }} title={editingUser ? 'Edit User' : 'Add User'}>
+              <UserForm
+                onSubmit={editingUser ? handleUserUpdate : handleUserSubmit}
+                onCancel={() => { setShowUserForm(false); setEditingUser(null); setEditingUserId(null); }}
+                isLoading={userLoading}
+                error={userError}
+                success={userSuccess}
+                editingUser={editingUser}
+              />
+            </Modal>
+            <UserTable
               users={users}
               onEdit={handleUserEdit}
               onDelete={user => handleUserDelete(user.id)}

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import UserTable from '@/components/admin/UserTable';
 import UserForm from '@/components/admin/UserForm';
