@@ -70,113 +70,130 @@ export default function DestinationForm({ onSubmit, isLoading, error, success, i
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2 className="text-xl font-bold text-gray-900 mb-2">
-        {initialData ? 'Edit Destination' : 'Add Destination'}
-      </h2>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Basic Information */}
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Destination Name *</label>
           <input 
             type="text" 
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Enter destination name"
             required 
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
           <input 
             type="text" 
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="City, Country"
             required 
           />
         </div>
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
             <input 
               type="text" 
               name="price"
               value={formData.price}
               onChange={handleChange}
-              className="input-field w-full"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="$100/night"
               required 
             />
           </div>
-          <div className="flex-1">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
             <input 
               type="number"
               name="rating"
               value={formData.rating}
               onChange={handleChange}
-              className="input-field w-full"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               min="0"
               max="5"
               step="0.1"
-              required
+              placeholder="4.5"
             />
           </div>
         </div>
+      </div>
+
+      {/* Media & Description */}
+      <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL *</label>
           <input 
             type="text" 
             name="image"
             value={formData.image}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="https://example.com/image.jpg"
             required 
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
           <textarea 
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Describe the destination..."
+            rows={3}
             required 
-            rows={2} 
           />
         </div>
+      </div>
+
+      {/* Features */}
+      <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Amenities (comma separated)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Amenities</label>
           <input 
             type="text" 
             name="amenities"
             value={formData.amenities}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="WiFi, Pool, Kitchen (comma separated)"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Features (comma separated)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Features</label>
           <input 
             type="text" 
             name="features"
             value={formData.features}
             onChange={handleChange}
-            className="input-field w-full"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Mountain View, Beach Access (comma separated)"
           />
         </div>
       </div>
-      {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
-      {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
-      <div className="flex justify-end gap-2 pt-4">
+
+      {/* Status Messages */}
+      {error && <div className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</div>}
+      {success && <div className="text-green-600 text-sm bg-green-50 p-2 rounded">{success}</div>}
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3 pt-4">
         {initialData && onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
         )}
         <Button type="submit" variant="primary" disabled={isLoading}>
-          {isLoading ? (initialData ? "Saving..." : "Saving...") : (initialData ? "Update" : "Add")}
+          {isLoading ? "Saving..." : (initialData ? "Update Destination" : "Add Destination")}
         </Button>
       </div>
     </form>

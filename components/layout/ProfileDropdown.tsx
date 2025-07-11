@@ -65,10 +65,10 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
       >
         <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
           <span className="text-white text-sm font-medium">
-            {user.name?.charAt(0)?.toUpperCase() || user.username.charAt(0).toUpperCase()}
+            {(user.name && user.name.charAt(0)?.toUpperCase()) || (user.username && user.username.charAt(0)?.toUpperCase()) || 'U'}
           </span>
         </div>
-        <span className="hidden sm:block text-gray-700 font-medium">{user.name || user.username}</span>
+        <span className="hidden sm:block text-gray-700 font-medium">{user.name || user.username || 'User'}</span>
         <svg 
           className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
           fill="none" 

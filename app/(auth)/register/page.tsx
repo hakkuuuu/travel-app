@@ -8,10 +8,13 @@ import Icon from '@/components/ui/Icon';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
+    name: '',
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    bio: '',
+    avatar: '/user.svg',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -51,7 +54,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const success = await register(formData.username, formData.email, formData.password);
+      const success = await register(formData.username, formData.email, formData.password, formData.name);
       if (!success) {
         setError('Registration failed. Username or email might already exist.');
       }
@@ -89,6 +92,22 @@ export default function RegisterPage() {
                 <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
+
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                placeholder="Your full name"
+              />
+            </div>
 
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
@@ -151,6 +170,35 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                 placeholder="Confirm your password"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
+                Bio (optional)
+              </label>
+              <input
+                id="bio"
+                name="bio"
+                type="text"
+                value={formData.bio}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                placeholder="Tell us about yourself"
+              />
+            </div>
+            <div>
+              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 mb-2">
+                Avatar URL (optional)
+              </label>
+              <input
+                id="avatar"
+                name="avatar"
+                type="text"
+                value={formData.avatar}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                placeholder="/user.svg or image URL"
               />
             </div>
 

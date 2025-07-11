@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'User with this email or username already exists.' }, { status: 409 });
     }
     const now = new Date().toISOString();
-    await users.insertOne({ 
+    const newUser = { 
       name, 
       email, 
       username, 
@@ -71,8 +71,16 @@ export async function POST(req: NextRequest) {
         notifications: { email: true, push: true, sms: false },
         privacy: { profileVisibility: 'public', showEmail: false, showActivity: true }
       }
+    };
+    await users.insertOne(newUser);
+    
+    // Return user data without password
+    const { password: _, ...userData } = newUser;
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Registration successful.',
+      user: userData
     });
-    return NextResponse.json({ success: true, message: 'Registration successful.' });
   } catch (err) {
     return NextResponse.json({ success: false, message: 'Server error.' }, { status: 500 });
   }
