@@ -251,6 +251,16 @@ export default function AdminPage() {
         {/* Destinations Tab */}
         {tab === 'destinations' && (
           <div className="space-y-8">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Destinations</h2>
+              <button
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
+                onClick={fetchDestinations}
+                disabled={destinationLoading}
+              >
+                {destinationLoading ? 'Refreshing...' : 'Refresh'}
+              </button>
+            </div>
             <DestinationForm 
               onSubmit={handleDestinationSubmit}
               isLoading={destinationLoading}
