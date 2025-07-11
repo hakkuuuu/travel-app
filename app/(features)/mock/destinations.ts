@@ -241,7 +241,7 @@ export const mockDestinations = [
     location: "Bangkok, Thailand",
     rating: 4.6,
     price: "$110/night",
-    image: "broken-image-url",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     description: "Modern rooftop tents in the heart of the city with skyline views.",
     amenities: ["Rooftop Bar", "Infinity Pool", "WiFi", "Breakfast"],
     features: [
@@ -249,6 +249,142 @@ export const mockDestinations = [
       "Rooftop bar and pool",
       "High-speed WiFi",
       "Complimentary breakfast"
+    ],
+    reviews: []
+  },
+  {
+    id: 13,
+    name: "Alpine Meadows Lodge",
+    location: "Swiss Alps, Switzerland",
+    rating: 4.9,
+    price: "$160/night",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Cozy mountain lodge with panoramic alpine views and skiing access.",
+    amenities: ["Skiing", "Mountain Views", "Spa", "Restaurant"],
+    features: [
+      "Direct ski lift access",
+      "Panoramic mountain views",
+      "On-site spa and wellness center",
+      "Gourmet restaurant with local cuisine"
+    ],
+    reviews: []
+  },
+  {
+    id: 14,
+    name: "Tropical Paradise Resort",
+    location: "Bali, Indonesia",
+    rating: 4.7,
+    price: "$130/night",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Luxury beachfront resort with traditional Balinese architecture.",
+    amenities: ["Beach Access", "Infinity Pool", "Spa", "Cultural Tours"],
+    features: [
+      "Private beach access",
+      "Infinity pool overlooking the ocean",
+      "Traditional Balinese spa treatments",
+      "Cultural village tours included"
+    ],
+    reviews: []
+  },
+  {
+    id: 15,
+    name: "Desert Luxury Camp",
+    location: "Sahara Desert, Morocco",
+    rating: 4.8,
+    price: "$140/night",
+    image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Luxury desert camp with camel treks and traditional Berber hospitality.",
+    amenities: ["Camel Treks", "Desert Tours", "Traditional Meals", "Stargazing"],
+    features: [
+      "Guided camel treks through the dunes",
+      "Traditional Berber tent accommodations",
+      "Authentic Moroccan cuisine",
+      "Unlimited stargazing opportunities"
+    ],
+    reviews: []
+  },
+  {
+    id: 16,
+    name: "Fjord Adventure Lodge",
+    location: "Geiranger, Norway",
+    rating: 4.9,
+    price: "$170/night",
+    image: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Spectacular fjord views with hiking and kayaking adventures.",
+    amenities: ["Fjord Views", "Hiking", "Kayaking", "Northern Lights"],
+    features: [
+      "Unobstructed fjord views from every room",
+      "Guided hiking trails",
+      "Sea kayaking equipment provided",
+      "Northern lights viewing in winter"
+    ],
+    reviews: []
+  },
+  {
+    id: 17,
+    name: "Wine Country Villa",
+    location: "Tuscany, Italy",
+    rating: 4.8,
+    price: "$190/night",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Charming villa surrounded by vineyards with wine tasting experiences.",
+    amenities: ["Wine Tasting", "Vineyard Tours", "Swimming Pool", "Cooking Classes"],
+    features: [
+      "Private wine cellar with tastings",
+      "Guided vineyard tours",
+      "Infinity pool with valley views",
+      "Traditional Italian cooking classes"
+    ],
+    reviews: []
+  },
+  {
+    id: 18,
+    name: "Arctic Wilderness Camp",
+    location: "Lapland, Finland",
+    rating: 4.7,
+    price: "$220/night",
+    image: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Unique glass igloos for aurora viewing and husky sledding adventures.",
+    amenities: ["Aurora Viewing", "Husky Sledding", "Glass Igloos", "Sauna"],
+    features: [
+      "Glass-roofed igloos for aurora viewing",
+      "Husky sledding adventures",
+      "Traditional Finnish sauna",
+      "Arctic wilderness survival training"
+    ],
+    reviews: []
+  },
+  {
+    id: 19,
+    name: "Island Treehouse Resort",
+    location: "Koh Samui, Thailand",
+    rating: 4.6,
+    price: "$120/night",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Unique treehouse accommodations in a tropical rainforest setting.",
+    amenities: ["Treehouse Lodging", "Rainforest Tours", "Beach Access", "Yoga"],
+    features: [
+      "Elevated treehouse accommodations",
+      "Guided rainforest nature walks",
+      "Private beach access",
+      "Daily yoga classes in the trees"
+    ],
+    reviews: []
+  },
+  {
+    id: 20,
+    name: "Mountain Monastery Retreat",
+    location: "Bhutan",
+    rating: 4.9,
+    price: "$180/night",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    description: "Spiritual retreat in a traditional Bhutanese monastery with meditation and cultural immersion.",
+    amenities: ["Meditation", "Cultural Tours", "Mountain Views", "Traditional Meals"],
+    features: [
+      "Daily meditation sessions with monks",
+      "Traditional Bhutanese cultural tours",
+      "Panoramic Himalayan mountain views",
+      "Authentic local cuisine included"
     ],
     reviews: []
   }

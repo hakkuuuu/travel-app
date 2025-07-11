@@ -56,46 +56,46 @@ export default function UserForm({ onSubmit, onCancel, isLoading, error, success
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-8 space-y-6 border border-gray-100">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900 flex items-center gap-2">
-        {editingUser ? 'Edit User' : 'Add New User'}
-        <span className="inline-block px-2 py-0.5 rounded bg-blue-500 text-white text-xs font-semibold ml-2">Admin Only</span>
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow p-6 space-y-4 border border-gray-100 w-full max-w-md mx-auto">
+      <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        {editingUser ? 'Edit User' : 'Add User'}
+        <span className="inline-block px-2 py-0.5 rounded bg-blue-500 text-white text-xs font-semibold">Admin</span>
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
           <input
             type="text"
             name="username"
             value={formData.username}
             onChange={handleChange}
-            className="input-field"
+            className="input-field w-full"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="input-field"
+            className="input-field w-full"
             required
           />
         </div>
       </div>
-      {error && <div className="text-red-600 font-medium">{error}</div>}
-      {success && <div className="text-green-600 font-medium">{success}</div>}
-      <div className="flex gap-4">
-        <Button type="submit" variant="primary" disabled={isLoading}>
-          {isLoading ? (editingUser ? "Saving..." : "Adding...") : (editingUser ? "Save Changes" : "Add User")}
-        </Button>
+      {error && <div className="text-red-600 text-sm">{error}</div>}
+      {success && <div className="text-green-600 text-sm">{success}</div>}
+      <div className="flex justify-end gap-2 pt-2">
         {editingUser && onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel}>
             Cancel
           </Button>
         )}
+        <Button type="submit" variant="primary" disabled={isLoading}>
+          {isLoading ? (editingUser ? "Saving..." : "Adding...") : (editingUser ? "Save" : "Add")}
+        </Button>
       </div>
     </form>
   );

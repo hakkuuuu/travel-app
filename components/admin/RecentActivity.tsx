@@ -23,8 +23,8 @@ export default function RecentActivity({ destinations, users }: RecentActivityPr
       {/* Recent Destinations */}
       <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Destinations</h3>
-        {destinations.slice(0, 5).map((dest) => (
-          <div key={dest.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+        {destinations.slice(0, 5).map((dest, idx) => (
+          <div key={dest.id ?? `dest-${idx}`} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
             <div>
               <p className="font-medium text-gray-900">{dest.name}</p>
               <p className="text-sm text-gray-600">{dest.location}</p>
@@ -37,8 +37,8 @@ export default function RecentActivity({ destinations, users }: RecentActivityPr
       {/* Recent Users */}
       <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Users</h3>
-        {users.slice(0, 5).map((user) => (
-          <div key={user.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+        {users.slice(0, 5).map((user, idx) => (
+          <div key={user.id ?? `user-${idx}`} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
             <div>
               <p className="font-medium text-gray-900">{user.username}</p>
               <p className="text-sm text-gray-600">{user.email}</p>

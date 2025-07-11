@@ -10,7 +10,21 @@ const nextConfig = {
   
   // Optimize images for production
   images: {
-    domains: ['images.unsplash.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
+      },
+      // Add more as needed
+    ],
     formats: ['image/webp', 'image/avif'],
   },
   
@@ -19,15 +33,19 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Webpack configuration for path resolution
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Ensure proper module resolution
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': path.resolve(__dirname),
-    };
-    
-    return config;
+  // Turbopack configuration
+  experimental: {
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+      resolveAlias: {
+        '@': path.resolve(__dirname),
+      },
+    },
   },
 
   // Environment-specific configuration

@@ -27,6 +27,23 @@ interface Review {
   date: string;
 }
 
+const FALLBACK_IMAGE = '/default-destination.jpg';
+const ALLOWED_IMAGE_HOSTNAMES = [
+  'images.unsplash.com',
+  'unsplash.com',
+  'plus.unsplash.com',
+];
+
+function isAllowedImageUrl(url: string | undefined) {
+  if (!url) return false;
+  try {
+    const { hostname } = new URL(url);
+    return ALLOWED_IMAGE_HOSTNAMES.includes(hostname);
+  } catch {
+    return false;
+  }
+}
+
 function DestinationDetailContent({ params }: { params: Promise<{ id: string }> }) {
   const [destination, setDestination] = useState<Destination | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,6 +130,11 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
     return <div className="py-32 text-center text-lg text-red-600">{error || 'Destination not found.'}</div>;
   }
 
+  // Ensure all arrays are defined
+  const reviews = destination.reviews ?? [];
+  const amenities = destination.amenities ?? [];
+  const features = destination.features ?? [];
+
   return (
     <div className="max-container padding-container py-16">
       <div className="max-w-6xl mx-auto">
@@ -121,10 +143,10 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-green-700 via-blue-600 to-green-400 bg-clip-text text-transparent">
             {destination?.name}
           </h1>
-          <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-4 text-gray-600">
             <span className="flex items-center">
               <span className="text-yellow-500 mr-1">★</span>
-              {destination?.rating} ({destination?.reviews.length} reviews)
+              {destination?.rating} ({reviews.length} reviews)
             </span>
             <span>•</span>
             <span>{destination?.location}</span>
@@ -135,35 +157,37 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Image */}
-            <div className="relative h-96 bg-gray-200 dark:bg-gray-700 rounded-2xl overflow-hidden">
+            <div className="relative h-96 bg-gray-200 rounded-2xl overflow-hidden">
               <Image
-                src={destination?.image}
-                alt={destination?.name}
+                src={isAllowedImageUrl(destination?.image) ? destination?.image! : FALLBACK_IMAGE}
+                alt={destination?.name || 'Destination'}
                 fill
                 className="object-cover"
+                sizes="(max-width: 768px) 100vw, 700px"
+                priority
               />
             </div>
 
             {/* Description */}
             <div>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 About this campsite
               </h2>
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 {destination?.description}
               </p>
             </div>
 
             {/* Features */}
             <div>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 What this place offers
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
-                {destination?.features.map((feature: string, index: number) => (
+                {features.map((feature: string, index: number) => (
                   <div key={index} className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                    <span className="text-gray-700">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -171,14 +195,14 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
 
             {/* Amenities */}
             <div>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              <h2 className="text-2xl font-semibold mb-4 text-gray-900">
                 Amenities
               </h2>
               <div className="flex flex-wrap gap-2">
-                {destination?.amenities.map((amenity: string) => (
+                {amenities.map((amenity: string) => (
                   <span
                     key={amenity}
-                    className="px-3 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-medium"
+                    className="px-3 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium"
                   >
                     {amenity}
                   </span>
@@ -188,21 +212,21 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
 
             {/* Reviews */}
             <div>
-              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900">
                 Reviews
               </h2>
               <div className="space-y-6">
-                {destination?.reviews.map((review: Review) => (
-                  <div key={review.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+                {reviews.map((review: Review) => (
+                  <div key={review.id} className="bg-white/80 backdrop-blur p-6 rounded-xl shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                          <span className="text-green-600 dark:text-green-400 font-semibold">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <span className="text-green-600 font-semibold">
                             {review.user.charAt(0)}
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                          <h4 className="font-semibold text-gray-900">
                             {review.user}
                           </h4>
                           <div className="flex items-center gap-1">
@@ -216,7 +240,7 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
                       </div>
                       <span className="text-sm text-gray-500">{review.date}</span>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
+                    <p className="text-gray-700">{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -225,17 +249,17 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
 
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg sticky top-8">
+            <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-lg sticky top-8">
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
                   {destination?.price}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">per night</p>
+                <p className="text-gray-600">per night</p>
               </div>
 
               <form onSubmit={handleBooking} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Check-in Date
                   </label>
                   <input
@@ -243,19 +267,19 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Nights
                   </label>
                   <select
                     value={nights}
                     onChange={(e) => setNights(Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                   >
                     {[1, 2, 3, 4, 5, 6, 7].map(n => (
                       <option key={n} value={n}>{n} night{n !== 1 ? 's' : ''}</option>
@@ -264,13 +288,13 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Guests
                   </label>
                   <select
                     value={guests}
                     onChange={(e) => setGuests(Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                   >
                     {[1, 2, 3, 4, 5, 6].map(g => (
                       <option key={g} value={g}>{g} guest{g !== 1 ? 's' : ''}</option>
@@ -280,18 +304,18 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
 
                 <div className="border-t pt-4">
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className="text-gray-600">
                       ${parseInt(destination?.price.replace('$', '').replace('/night', '') || '0')} × {nights} nights
                     </span>
-                    <span className="text-gray-900 dark:text-gray-100">${totalPrice}</span>
+                    <span className="text-gray-900">${totalPrice}</span>
                   </div>
                   <div className="flex justify-between mb-2">
-                    <span className="text-gray-600 dark:text-gray-400">Service fee</span>
-                    <span className="text-gray-900 dark:text-gray-100">$5</span>
+                    <span className="text-gray-600">Service fee</span>
+                    <span className="text-gray-900">$5</span>
                   </div>
                   <div className="flex justify-between text-lg font-semibold">
-                    <span className="text-gray-900 dark:text-gray-100">Total</span>
-                    <span className="text-gray-900 dark:text-gray-100">${totalPrice + 5}</span>
+                    <span className="text-gray-900">Total</span>
+                    <span className="text-gray-900">${totalPrice + 5}</span>
                   </div>
                 </div>
 
