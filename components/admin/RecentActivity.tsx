@@ -7,9 +7,13 @@ interface Destination {
 
 interface User {
   id: number;
+  name?: string;
   username: string;
   email: string;
-  createdAt: string;
+  role?: string;
+  bio?: string;
+  avatar?: string;
+  createdAt?: string;
 }
 
 interface RecentActivityProps {
@@ -44,7 +48,7 @@ export default function RecentActivity({ destinations, users }: RecentActivityPr
               <p className="text-sm text-gray-600">{user.email}</p>
             </div>
             <span className="text-sm text-gray-500">
-              {new Date(user.createdAt).toLocaleDateString()}
+              {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
             </span>
           </div>
         ))}
