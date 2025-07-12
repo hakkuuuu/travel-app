@@ -3,10 +3,13 @@ import { FaEdit, FaTrash, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export interface User {
   id: number;
+  name?: string;
   username: string;
   email: string;
   role?: string;
-  createdAt: string;
+  bio?: string;
+  avatar?: string;
+  createdAt?: string;
 }
 
 interface UserTableProps {
@@ -66,7 +69,7 @@ export default function UserTable({ users, onEdit, onDelete, isLoading, onSort, 
                 <td className="px-6 py-3 text-sm text-gray-900 font-medium align-middle">{user.username}</td>
                 <td className="px-6 py-3 text-sm text-gray-700 align-middle">{user.email}</td>
                 <td className="px-6 py-3 text-sm text-gray-700 align-middle">{user.role || 'user'}</td>
-                <td className="px-6 py-3 text-sm text-gray-500 align-middle">{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td className="px-6 py-3 text-sm text-gray-500 align-middle">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</td>
                 <td className="px-6 py-3 align-middle">
                   <div className="flex justify-center gap-2">
                     <button

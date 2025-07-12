@@ -13,12 +13,12 @@ interface UserFormData {
 
 interface User {
   id: number;
-  name: string;
+  name?: string;
   username: string;
   email: string;
-  role: string;
-  bio: string;
-  avatar: string;
+  role?: string;
+  bio?: string;
+  avatar?: string;
 }
 
 interface UserFormProps {
@@ -46,8 +46,13 @@ export default function UserForm({ onSubmit, onCancel, isLoading, error, success
   useEffect(() => {
     if (editingUser) {
       setFormData({
-        ...editingUser,
+        name: editingUser.name || '',
+        username: editingUser.username,
+        email: editingUser.email,
         password: '', // Don't prefill password
+        role: editingUser.role || 'user',
+        bio: editingUser.bio || '',
+        avatar: editingUser.avatar || '/user.svg',
       });
     } else {
       setFormData({ ...defaultForm });

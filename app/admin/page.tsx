@@ -244,9 +244,8 @@ export default function AdminPage() {
         {tab === 'dashboard' && (
           <div className="space-y-8">
             <DashboardStats 
-              destinationsCount={destinations.length} 
-              usersCount={users.length} 
-              reviewsCount={destinations.reduce((acc, dest) => acc + (dest.reviews ? dest.reviews.length : 0), 0)}
+              destinations={destinations}
+              users={users}
             />
             <RecentActivity 
               destinations={destinations}
