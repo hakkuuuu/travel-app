@@ -2,48 +2,91 @@
 import DestinationList from '@/components/admin/DestinationList';
 import DestinationForm from '@/components/admin/DestinationForm';
 import Modal from '@/components/ui/Modal';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import Button from '@/components/ui/Button';
 import { useState, useEffect } from 'react';
+import { useAdminStore } from '@/store';
+import { useUIStore } from '@/store';
+import toast from 'react-hot-toast';
+import { FaPlus, FaSync, FaEdit, FaTrash } from 'react-icons/fa';
 
 export default function AdminDestinationsPage() {
-  const [destinations, setDestinations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
-
-  const fetchDestinations = () => {
-    setLoading(true);
-    fetch('/api/destinations')
-      .then(res => res.json())
-      .then(data => setDestinations(data))
-      .catch(() => setError('Failed to load destinations'))
-      .finally(() => setLoading(false));
-  };
+  const {
+    destinations,
+    isLoading,
+    error,
+    fetchDestinations,
+    createDestination,
+    updateDestination,
+    deleteDestination,
+    clearError
+  } = useAdminStore();
+  
+  const { modal, openModal, closeModal } = useUIStore();
+  const [editingDestination, setEditingDestination] = useState<any>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [destinationToDelete, setDestinationToDelete] = useState<any>(null);
 
   useEffect(() => {
     fetchDestinations();
-  }, []);
+  }, [fetchDestinations]);
 
   const handleAddDestination = async (formData: any) => {
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-    try {
-      const res = await fetch('/api/destinations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error('Failed to add destination');
-      setSuccess('Destination added!');
-      setShowForm(false);
-      fetchDestinations();
-    } catch (e) {
-      setError('Failed to add destination');
-    } finally {
-      setLoading(false);
-      setTimeout(() => setSuccess(null), 2500);
+    const success = await createDestination(formData);
+    if (success) {
+      closeModal();
+      setEditingDestination(null);
+      toast.success('Destination added successfully! 🎉');
     }
+  };
+
+  const handleEditDestination = async (formData: any) => {
+    if (!editingDestination) return;
+    
+    const success = await updateDestination(editingDestination.id, formData);
+    if (success) {
+      closeModal();
+      setEditingDestination(null);
+      toast.success('Destination updated successfully! ✨');
+    }
+  };
+
+  const handleDeleteClick = (destination: any) => {
+    setDestinationToDelete(destination);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!destinationToDelete) return;
+    
+    const success = await deleteDestination(destinationToDelete.id);
+    if (success) {
+      toast.success(`Destination "${destinationToDelete.name}" deleted successfully! 🗑️`);
+    }
+    
+    setShowDeleteConfirmation(false);
+    setDestinationToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setDestinationToDelete(null);
+  };
+
+  const handleRefresh = async () => {
+    toast.loading('Refreshing destinations...');
+    await fetchDestinations();
+    toast.success('Destinations refreshed! 🔄');
+  };
+
+  const openAddModal = () => {
+    setEditingDestination(null);
+    openModal('destination-form');
+  };
+
+  const openEditModal = (destination: any) => {
+    setEditingDestination(destination);
+    openModal('destination-form');
   };
 
   return (
@@ -51,34 +94,57 @@ export default function AdminDestinationsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Destinations</h1>
         <div className="flex gap-2">
-          <button
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
-            onClick={() => setShowForm(true)}
+          <Button
+            onClick={openAddModal}
+            variant="success"
+            icon={<FaPlus className="w-4 h-4" />}
           >
-            + Add Destination
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
-            onClick={fetchDestinations}
-            disabled={loading}
+            Add Destination
+          </Button>
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            icon={<FaSync className="w-4 h-4" />}
+            loading={isLoading}
           >
-            {loading ? 'Refreshing...' : 'Refresh'}
-          </button>
+            Refresh
+          </Button>
         </div>
       </div>
-      <Modal isOpen={showForm} onClose={() => setShowForm(false)} title="Add Destination">
+      
+      <Modal 
+        isOpen={modal.isOpen && modal.type === 'destination-form'} 
+        onClose={closeModal} 
+        title={editingDestination ? 'Edit Destination' : 'Add Destination'}
+      >
         <DestinationForm
-          onSubmit={handleAddDestination}
-          isLoading={loading}
+          onSubmit={editingDestination ? handleEditDestination : handleAddDestination}
+          isLoading={isLoading}
           error={error}
-          success={success}
+          success={null}
+          initialData={editingDestination}
+          onCancel={closeModal}
         />
       </Modal>
+      
       <DestinationList
         destinations={destinations}
-        isLoading={loading}
-        onEdit={() => {}}
-        onDelete={() => {}}
+        isLoading={isLoading}
+        onEdit={openEditModal}
+        onDelete={handleDeleteClick}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Destination"
+        message={`Are you sure you want to delete "${destinationToDelete?.name}"? This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete Destination"
+        cancelText="Cancel"
+        type="danger"
+        loading={isLoading}
       />
     </div>
   );

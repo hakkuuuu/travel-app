@@ -1,75 +1,131 @@
 'use client';
 import { useState, useEffect } from 'react';
-import useSWR from 'swr';
 import UserTable from '@/components/admin/UserTable';
 import UserForm from '@/components/admin/UserForm';
 import Modal from '@/components/ui/Modal';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import Button from '@/components/ui/Button';
+import { useAdminStore } from '@/store';
+import { useUIStore } from '@/store';
+import toast from 'react-hot-toast';
+import { FaPlus, FaSync, FaEdit, FaTrash } from 'react-icons/fa';
 import type { User } from '@/components/admin/UserTable';
 
-const fetcher = (url: string) => fetch(url).then(res => res.json());
-
 export default function AdminUsersPage() {
-  const { data: users = [], error, isLoading, mutate } = useSWR<User[]>('/api/users', fetcher);
-  const [showForm, setShowForm] = useState(false);
+  const {
+    users,
+    isLoading,
+    error,
+    fetchUsers,
+    createUser,
+    updateUser,
+    deleteUser,
+    clearError
+  } = useAdminStore();
+  
+  const { modal, openModal, closeModal } = useUIStore();
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formError, setFormError] = useState<string|null>(null);
-  const [formSuccess, setFormSuccess] = useState<string|null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleAdd = () => {
     setEditingUser(null);
-    setShowForm(true);
-    setFormError(null);
-    setFormSuccess(null);
+    openModal('user-form');
   };
+
   const handleEdit = (user: User) => {
     setEditingUser(user);
-    setShowForm(true);
-    setFormError(null);
-    setFormSuccess(null);
+    openModal('user-form');
   };
-  const handleDelete = async (user: User) => {
-    if (!window.confirm(`Delete user ${user.username}?`)) return;
-    try {
-      const res = await fetch(`/api/users?id=${user.id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete user');
-      setFormSuccess('User deleted');
-      mutate();
-    } catch (e) {
-      setFormError('Failed to delete user');
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+    
+    const success = await deleteUser(userToDelete.id);
+    if (success) {
+      toast.success(`User "${userToDelete.username}" deleted successfully! 🗑️`);
     }
+    
+    setShowDeleteConfirmation(false);
+    setUserToDelete(null);
   };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setUserToDelete(null);
+  };
+
   const handleFormSubmit = async (formData: any) => {
-    try {
-      const res = await fetch('/api/users' + (editingUser ? `?id=${editingUser.id}` : ''), {
-        method: editingUser ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error('Failed to save user');
-      setFormSuccess(editingUser ? 'User updated' : 'User added');
-      setShowForm(false);
-      mutate();
-    } catch (e) {
-      setFormError('Failed to save user');
+    if (editingUser) {
+      const success = await updateUser(editingUser.id, formData);
+      if (success) {
+        closeModal();
+        setEditingUser(null);
+        toast.success('User updated successfully! ✨');
+      }
+    } else {
+      const success = await createUser(formData);
+      if (success) {
+        closeModal();
+        setEditingUser(null);
+        toast.success('User created successfully! 🎉');
+      }
     }
+  };
+
+  const handleRefresh = async () => {
+    toast.loading('Refreshing users...');
+    await fetchUsers();
+    toast.success('Users refreshed! 🔄');
   };
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-900">Users</h1>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold" onClick={handleAdd}>+ Add User</button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleAdd}
+            variant="success"
+            icon={<FaPlus className="w-4 h-4" />}
+          >
+            Add User
+          </Button>
+          <Button
+            onClick={handleRefresh}
+            variant="outline"
+            icon={<FaSync className="w-4 h-4" />}
+            loading={isLoading}
+          >
+            Refresh
+          </Button>
+        </div>
       </div>
-      <Modal isOpen={showForm} onClose={()=>setShowForm(false)} title={editingUser ? 'Edit User' : 'Add User'}>
+      
+      <Modal 
+        isOpen={modal.isOpen && modal.type === 'user-form'} 
+        onClose={closeModal} 
+        title={editingUser ? 'Edit User' : 'Add User'}
+      >
         <UserForm
           onSubmit={handleFormSubmit}
-          isLoading={false}
-          error={formError}
-          success={formSuccess}
+          isLoading={isLoading}
+          error={error}
+          success={null}
           editingUser={editingUser}
-          onCancel={()=>setShowForm(false)}
+          onCancel={closeModal}
         />
       </Modal>
+      
       <div className="overflow-x-auto relative">
         {isLoading && <div>Loading...</div>}
         {error && <div className="text-red-500">Failed to load users</div>}
@@ -77,9 +133,22 @@ export default function AdminUsersPage() {
           users={users}
           isLoading={isLoading}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteClick}
         />
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete User"
+        message={`Are you sure you want to delete user "${userToDelete?.username}"? This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete User"
+        cancelText="Cancel"
+        type="danger"
+        loading={isLoading}
+      />
     </div>
   );
 } 

@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
       averageRating: 0,
       favoriteDestination: 'No destinations visited yet',
       totalNights: 0,
-      memberSince: userData.createdAt || new Date().toISOString().split('T')[0]
+      memberSince: userData.createdAt || new Date().toISOString()
     };
 
     // Get recent activity

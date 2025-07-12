@@ -21,14 +21,39 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Toaster
-            position="bottom-left"
+            position="top-right"
             toastOptions={{
+              duration: 4000,
               style: {
-                fontSize: '1.15rem',
-                padding: '1.25rem 2rem',
-                borderRadius: '1rem',
+                fontSize: '1rem',
+                padding: '1rem 1.5rem',
+                borderRadius: '0.75rem',
                 minWidth: '300px',
                 maxWidth: '90vw',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+              },
+              success: {
+                style: {
+                  background: '#f0fdf4',
+                  color: '#166534',
+                  border: '1px solid #bbf7d0',
+                },
+                iconTheme: {
+                  primary: '#16a34a',
+                  secondary: '#f0fdf4',
+                },
+              },
+              error: {
+                style: {
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  border: '1px solid #fecaca',
+                },
+                iconTheme: {
+                  primary: '#dc2626',
+                  secondary: '#fef2f2',
+                },
               },
             }}
           />

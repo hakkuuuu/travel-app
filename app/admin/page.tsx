@@ -7,6 +7,12 @@ import DestinationList from '@/components/admin/DestinationList';
 import UserForm from '@/components/admin/UserForm';
 import UserTable, { User } from '@/components/admin/UserTable';
 import Modal from '@/components/ui/Modal';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import Button from '@/components/ui/Button';
+import { useAdminStore } from '@/store';
+import { useUIStore } from '@/store';
+import toast from 'react-hot-toast';
+import { FaPlus, FaSync } from 'react-icons/fa';
 
 interface Destination {
   id: number;
@@ -25,160 +31,165 @@ export default function AdminPage() {
   // Tabs
   const [tab, setTab] = useState<'dashboard' | 'destinations' | 'users'>('dashboard');
 
-  // Destinations state
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [destinationLoading, setDestinationLoading] = useState(false);
-  const [destinationError, setDestinationError] = useState<string | null>(null);
-  const [destinationSuccess, setDestinationSuccess] = useState<string | null>(null);
-  const [showDestinationForm, setShowDestinationForm] = useState(false);
+  // Admin store
+  const {
+    destinations,
+    users,
+    stats,
+    isLoading,
+    error,
+    fetchDestinations,
+    fetchUsers,
+    fetchStats,
+    createDestination,
+    updateDestination,
+    deleteDestination,
+    createUser,
+    updateUser,
+    deleteUser,
+    clearError
+  } = useAdminStore();
 
-  // Users state
-  const [users, setUsers] = useState<User[]>([]);
-  const [userLoading, setUserLoading] = useState(false);
-  const [userError, setUserError] = useState<string | null>(null);
-  const [userSuccess, setUserSuccess] = useState<string | null>(null);
-  const [editingUserId, setEditingUserId] = useState<number | null>(null);
+  // UI store
+  const { modal, openModal, closeModal } = useUIStore();
+
+  // Local state
+  const [editingDestination, setEditingDestination] = useState<Destination | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [showUserForm, setShowUserForm] = useState(false);
+  const [showDestinationDeleteConfirmation, setShowDestinationDeleteConfirmation] = useState(false);
+  const [showUserDeleteConfirmation, setShowUserDeleteConfirmation] = useState(false);
+  const [destinationToDelete, setDestinationToDelete] = useState<Destination | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   // Fetch data based on tab
   useEffect(() => {
-    if (tab === 'destinations') fetchDestinations();
-    if (tab === 'users') fetchUsers();
-    if (tab === 'dashboard') {
+    if (tab === 'destinations') {
+      fetchDestinations();
+    } else if (tab === 'users') {
+      fetchUsers();
+    } else if (tab === 'dashboard') {
       fetchDestinations();
       fetchUsers();
+      fetchStats();
     }
-  }, [tab]);
+  }, [tab, fetchDestinations, fetchUsers, fetchStats]);
 
-  async function fetchDestinations() {
-    setDestinationLoading(true);
-    setDestinationError(null);
-    try {
-      const res = await fetch("/api/destinations");
-      const data = await res.json();
-      setDestinations(data);
-    } catch (e) {
-      setDestinationError("Failed to fetch destinations");
-    } finally {
-      setDestinationLoading(false);
+  // Destination handlers
+  const handleDestinationSubmit = async (formData: any) => {
+    const success = await createDestination({
+      ...formData,
+      amenities: formData.amenities.split(",").map((a: string) => a.trim()).filter(Boolean),
+      features: formData.features.split(",").map((f: string) => f.trim()).filter(Boolean),
+    });
+    if (success) {
+      closeModal();
+      setEditingDestination(null);
+      toast.success('Destination created successfully! 🎉');
     }
-  }
+  };
 
-  async function handleDestinationSubmit(formData: any) {
-    setDestinationLoading(true);
-    setDestinationError(null);
-    setDestinationSuccess(null);
-    try {
-      const res = await fetch("/api/destinations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          amenities: formData.amenities.split(",").map((a: string) => a.trim()).filter(Boolean),
-          features: formData.features.split(",").map((f: string) => f.trim()).filter(Boolean),
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to add destination");
-      setDestinationSuccess("Destination added!");
-      fetchDestinations();
-      setShowDestinationForm(false);
-    } catch (e) {
-      setDestinationError("Failed to add destination");
-    } finally {
-      setDestinationLoading(false);
-      setTimeout(() => setDestinationSuccess(null), 2500);
+  const handleDestinationEdit = async (formData: any) => {
+    if (!editingDestination) return;
+    
+    const success = await updateDestination(editingDestination.id, {
+      ...formData,
+      amenities: formData.amenities.split(",").map((a: string) => a.trim()).filter(Boolean),
+      features: formData.features.split(",").map((f: string) => f.trim()).filter(Boolean),
+    });
+    if (success) {
+      closeModal();
+      setEditingDestination(null);
+      toast.success('Destination updated successfully! ✨');
     }
-  }
+  };
 
-  // USERS CRUD
-  async function fetchUsers() {
-    setUserLoading(true);
-    setUserError(null);
-    try {
-      const res = await fetch("/api/users");
-      const data = await res.json();
-      setUsers(data);
-    } catch (e) {
-      setUserError("Failed to fetch users");
-    } finally {
-      setUserLoading(false);
+  const handleDestinationDeleteClick = (destination: Destination) => {
+    setDestinationToDelete(destination);
+    setShowDestinationDeleteConfirmation(true);
+  };
+
+  const handleDestinationDeleteConfirm = async () => {
+    if (!destinationToDelete) return;
+    
+    const success = await deleteDestination(destinationToDelete.id);
+    if (success) {
+      toast.success(`Destination "${destinationToDelete.name}" deleted successfully! 🗑️`);
     }
-  }
+    
+    setShowDestinationDeleteConfirmation(false);
+    setDestinationToDelete(null);
+  };
 
-  async function handleUserSubmit(formData: any) {
-    setUserLoading(true);
-    setUserError(null);
-    setUserSuccess(null);
-    try {
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error("Failed to add user");
-      setUserSuccess("User added!");
-      fetchUsers();
-      setShowUserForm(false);
-    } catch (e) {
-      setUserError("Failed to add user");
-    } finally {
-      setUserLoading(false);
-      setTimeout(() => setUserSuccess(null), 2500);
-    }
-  }
+  const handleDestinationDeleteCancel = () => {
+    setShowDestinationDeleteConfirmation(false);
+    setDestinationToDelete(null);
+  };
 
-  async function handleUserEdit(user: User) {
-    setEditingUserId(user.id);
-    setEditingUser(user);
-  }
-
-  async function handleUserUpdate(formData: any) {
-    if (editingUserId === null) return;
-    setUserLoading(true);
-    setUserError(null);
-    try {
-      const res = await fetch(`/api/users?id=${editingUserId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error("Failed to update user");
-      setUserSuccess("User updated!");
-      setEditingUserId(null);
+  // User handlers
+  const handleUserSubmit = async (formData: any) => {
+    const success = await createUser(formData);
+    if (success) {
+      closeModal();
       setEditingUser(null);
-      fetchUsers();
-      setShowUserForm(false);
-    } catch (e) {
-      setUserError("Failed to update user");
-    } finally {
-      setUserLoading(false);
-      setTimeout(() => setUserSuccess(null), 2500);
+      toast.success('User created successfully! 🎉');
     }
-  }
+  };
 
-  async function handleUserDelete(id: number) {
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
-    setUserLoading(true);
-    setUserError(null);
-    try {
-      const res = await fetch(`/api/users?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete user");
-      setUserSuccess("User deleted!");
-      fetchUsers();
-    } catch (e) {
-      setUserError("Failed to delete user");
-    } finally {
-      setUserLoading(false);
-      setTimeout(() => setUserSuccess(null), 2500);
+  const handleUserEdit = async (formData: any) => {
+    if (!editingUser) return;
+    
+    const success = await updateUser(editingUser.id, formData);
+    if (success) {
+      closeModal();
+      setEditingUser(null);
+      toast.success('User updated successfully! ✨');
     }
-  }
+  };
 
-  const handleUserCancel = () => {
-    setEditingUserId(null);
-    setEditingUser(null);
+  const handleUserDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setShowUserDeleteConfirmation(true);
+  };
+
+  const handleUserDeleteConfirm = async () => {
+    if (!userToDelete) return;
+    
+    const success = await deleteUser(userToDelete.id);
+    if (success) {
+      toast.success(`User "${userToDelete.username}" deleted successfully! 🗑️`);
+    }
+    
+    setShowUserDeleteConfirmation(false);
+    setUserToDelete(null);
+  };
+
+  const handleUserDeleteCancel = () => {
+    setShowUserDeleteConfirmation(false);
+    setUserToDelete(null);
+  };
+
+  // Modal handlers
+  const openDestinationModal = (destination?: Destination) => {
+    setEditingDestination(destination || null);
+    openModal('destination-form');
+  };
+
+  const openUserModal = (user?: User) => {
+    setEditingUser(user || null);
+    openModal('user-form');
+  };
+
+  // Refresh handlers
+  const handleRefreshDestinations = async () => {
+    toast.loading('Refreshing destinations...');
+    await fetchDestinations();
+    toast.success('Destinations refreshed! 🔄');
+  };
+
+  const handleRefreshUsers = async () => {
+    toast.loading('Refreshing users...');
+    await fetchUsers();
+    toast.success('Users refreshed! 🔄');
   };
 
   return (
@@ -259,34 +270,44 @@ export default function AdminPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">Destinations</h2>
               <div className="flex gap-2">
-                <button
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
-                  onClick={() => setShowDestinationForm(true)}
+                <Button
+                  onClick={() => openDestinationModal()}
+                  variant="success"
+                  icon={<FaPlus className="w-4 h-4" />}
                 >
-                  + Add Destination
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
-                  onClick={fetchDestinations}
-                  disabled={destinationLoading}
+                  Add Destination
+                </Button>
+                <Button
+                  onClick={handleRefreshDestinations}
+                  variant="outline"
+                  icon={<FaSync className="w-4 h-4" />}
+                  loading={isLoading}
                 >
-                  {destinationLoading ? 'Refreshing...' : 'Refresh'}
-                </button>
+                  Refresh
+                </Button>
               </div>
             </div>
-            <Modal isOpen={showDestinationForm} onClose={() => setShowDestinationForm(false)} title="Add Destination">
+            
+            <Modal 
+              isOpen={modal.isOpen && modal.type === 'destination-form'} 
+              onClose={closeModal} 
+              title={editingDestination ? 'Edit Destination' : 'Add Destination'}
+            >
               <DestinationForm
-                onSubmit={handleDestinationSubmit}
-                isLoading={destinationLoading}
-                error={destinationError}
-                success={destinationSuccess}
+                onSubmit={editingDestination ? handleDestinationEdit : handleDestinationSubmit}
+                isLoading={isLoading}
+                error={error}
+                success={null}
+                initialData={editingDestination}
+                onCancel={closeModal}
               />
             </Modal>
+            
             <DestinationList 
               destinations={destinations}
-              isLoading={destinationLoading}
-              onEdit={() => {}}
-              onDelete={() => {}}
+              isLoading={isLoading}
+              onEdit={openDestinationModal}
+              onDelete={handleDestinationDeleteClick}
             />
           </div>
         )}
@@ -296,40 +317,73 @@ export default function AdminPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">Users</h2>
               <div className="flex gap-2">
-                <button
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 font-semibold"
-                  onClick={() => { setEditingUser(null); setEditingUserId(null); setUserError(null); setUserSuccess(null); setShowUserForm(true); }}
+                <Button
+                  onClick={() => openUserModal()}
+                  variant="success"
+                  icon={<FaPlus className="w-4 h-4" />}
                 >
-                  + Add User
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
-                  onClick={fetchUsers}
-                  disabled={userLoading}
+                  Add User
+                </Button>
+                <Button
+                  onClick={handleRefreshUsers}
+                  variant="outline"
+                  icon={<FaSync className="w-4 h-4" />}
+                  loading={isLoading}
                 >
-                  {userLoading ? 'Refreshing...' : 'Refresh'}
-                </button>
+                  Refresh
+                </Button>
               </div>
             </div>
-            <Modal isOpen={showUserForm || editingUser !== null} onClose={() => { setShowUserForm(false); setEditingUser(null); setEditingUserId(null); }} title={editingUser ? 'Edit User' : 'Add User'}>
+            
+            <Modal 
+              isOpen={modal.isOpen && modal.type === 'user-form'} 
+              onClose={closeModal} 
+              title={editingUser ? 'Edit User' : 'Add User'}
+            >
               <UserForm
-                onSubmit={editingUser ? handleUserUpdate : handleUserSubmit}
-                onCancel={() => { setShowUserForm(false); setEditingUser(null); setEditingUserId(null); }}
-                isLoading={userLoading}
-                error={userError}
-                success={userSuccess}
+                onSubmit={editingUser ? handleUserEdit : handleUserSubmit}
+                onCancel={closeModal}
+                isLoading={isLoading}
+                error={error}
+                success={null}
                 editingUser={editingUser}
               />
             </Modal>
+            
             <UserTable
               users={users}
-              onEdit={handleUserEdit}
-              onDelete={user => handleUserDelete(user.id)}
-              isLoading={userLoading}
+              onEdit={openUserModal}
+              onDelete={handleUserDeleteClick}
+              isLoading={isLoading}
             />
           </div>
         )}
       </div>
+
+      {/* Confirmation Dialogs */}
+      <ConfirmationDialog
+        isOpen={showDestinationDeleteConfirmation}
+        onClose={handleDestinationDeleteCancel}
+        onConfirm={handleDestinationDeleteConfirm}
+        title="Delete Destination"
+        message={`Are you sure you want to delete "${destinationToDelete?.name}"? This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete Destination"
+        cancelText="Cancel"
+        type="danger"
+        loading={isLoading}
+      />
+
+      <ConfirmationDialog
+        isOpen={showUserDeleteConfirmation}
+        onClose={handleUserDeleteCancel}
+        onConfirm={handleUserDeleteConfirm}
+        title="Delete User"
+        message={`Are you sure you want to delete user "${userToDelete?.username}"? This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete User"
+        cancelText="Cancel"
+        type="danger"
+        loading={isLoading}
+      />
     </div>
   );
 } 

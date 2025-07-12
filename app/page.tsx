@@ -272,7 +272,7 @@ export default function Home() {
                 description: 'All our destinations are personally verified to ensure quality and safety.'
               }
             ].map((feature, index) => (
-              <div key={index} className="text-center p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+              <div key={index} className="text-center p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-soft mb-6">
                   <Icon name={feature.icon} size="xl" />
                 </div>
