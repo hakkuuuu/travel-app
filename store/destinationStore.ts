@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { apiCall, showErrorToast, showSuccessToast, handleApiError, buildQueryParams } from './utils';
 import { ApiResponse, PaginatedResponse } from './types';
+import toast from 'react-hot-toast';
 
 // Types
 export interface Destination {
