@@ -3,16 +3,22 @@ import clientPromise from '../../mongodb';
 
 const COLLECTION = 'destinations';
 
+// Helper to extract id from the URL
+function extractIdFromUrl(url: string): string | null {
+  const match = url.match(/\/api\/destinations\/(\d+)/);
+  return match ? match[1] : null;
+}
+
 // PUT /api/destinations/[id]
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db();
     const body = await request.json();
-    const id = params.id;
+    const id = extractIdFromUrl(request.url);
+    if (!id) {
+      return NextResponse.json({ error: 'Invalid destination id' }, { status: 400 });
+    }
 
     // Check if destination exists
     const existingDestination = await db.collection(COLLECTION).findOne({ id: Number(id) });
@@ -41,14 +47,14 @@ export async function PUT(
 }
 
 // DELETE /api/destinations/[id]
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const id = params.id;
+    const id = extractIdFromUrl(request.url);
+    if (!id) {
+      return NextResponse.json({ error: 'Invalid destination id' }, { status: 400 });
+    }
 
     // Check if destination exists
     const destination = await db.collection(COLLECTION).findOne({ id: Number(id) });
