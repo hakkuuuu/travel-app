@@ -13,39 +13,39 @@ type Logger = <
 
 // Logger middleware
 export const logger: Logger = (f, name) => (set, get, store) => {
-  const loggedSet: typeof set = (...a) => {
-    set(...a);
+  const loggedSet = (partial: any, replace?: any, action?: any) => {
+    set(partial, replace, action);
     console.log(`${name || 'store'}`, get());
   };
-  return f(loggedSet, get, store);
+  return f(loggedSet as any, get, store);
 };
 
 // Error boundary middleware
 export const errorBoundary = <T extends unknown>(
   f: StateCreator<T>,
   name?: string
-) => (set, get, store) => {
-  const wrappedSet: typeof set = (...args) => {
+) => (set: any, get: any, store: any) => {
+  const wrappedSet = (partial: any, replace?: any, action?: any) => {
     try {
-      set(...args);
+      set(partial, replace, action);
     } catch (error) {
       console.error(`Error in ${name || 'store'} set:`, error);
       // You could dispatch to an error store here
     }
   };
 
-  return f(wrappedSet, get, store);
+  return f(wrappedSet as any, get, store);
 };
 
 // Analytics middleware
 export const analytics = <T extends unknown>(
   f: StateCreator<T>,
   name?: string
-) => (set, get, store) => {
-  const trackedSet: typeof set = (...args) => {
+) => (set: any, get: any, store: any) => {
+  const trackedSet = (partial: any, replace?: any, action?: any) => {
     // Track state changes for analytics
     const prevState = get();
-    set(...args);
+    set(partial, replace, action);
     const newState = get();
     
     // You could send analytics events here
@@ -57,25 +57,25 @@ export const analytics = <T extends unknown>(
     }
   };
 
-  return f(trackedSet, get, store);
+  return f(trackedSet as any, get, store);
 };
 
 // Performance monitoring middleware
 export const performance = <T extends unknown>(
   f: StateCreator<T>,
   name?: string
-) => (set, get, store) => {
-  const performanceSet: typeof set = (...args) => {
-    const start = performance.now();
-    set(...args);
-    const end = performance.now();
+) => (set: any, get: any, store: any) => {
+  const performanceSet = (partial: any, replace?: any, action?: any) => {
+    const start = (globalThis as any).performance?.now?.() || Date.now();
+    set(partial, replace, action);
+    const end = (globalThis as any).performance?.now?.() || Date.now();
     
     if (end - start > 16) { // Longer than one frame
       console.warn(`Slow state update in ${name || 'store'}: ${end - start}ms`);
     }
   };
 
-  return f(performanceSet, get, store);
+  return f(performanceSet as any, get, store);
 };
 
 // Validation middleware
@@ -83,9 +83,9 @@ export const validate = <T extends unknown>(
   f: StateCreator<T>,
   validator: (state: T) => boolean | string,
   name?: string
-) => (set, get, store) => {
-  const validatedSet: typeof set = (...args) => {
-    set(...args);
+) => (set: any, get: any, store: any) => {
+  const validatedSet = (partial: any, replace?: any, action?: any) => {
+    set(partial, replace, action);
     const state = get();
     const validation = validator(state);
     
@@ -94,20 +94,20 @@ export const validate = <T extends unknown>(
     }
   };
 
-  return f(validatedSet, get, store);
+  return f(validatedSet as any, get, store);
 };
 
 // Optimistic updates middleware
 export const optimistic = <T extends unknown>(
   f: StateCreator<T>,
   name?: string
-) => (set, get, store) => {
-  const optimisticSet: typeof set = (...args) => {
+) => (set: any, get: any, store: any) => {
+  const optimisticSet = (partial: any, replace?: any, action?: any) => {
     // Store previous state for rollback
     const prevState = get();
     
     try {
-      set(...args);
+      set(partial, replace, action);
     } catch (error) {
       // Rollback on error
       set(prevState);
@@ -115,7 +115,7 @@ export const optimistic = <T extends unknown>(
     }
   };
 
-  return f(optimisticSet, get, store);
+  return f(optimisticSet as any, get, store);
 };
 
 // Throttle middleware
@@ -123,17 +123,17 @@ export const throttle = <T extends unknown>(
   f: StateCreator<T>,
   delay: number = 100,
   name?: string
-) => (set, get, store) => {
+) => (set: any, get: any, store: any) => {
   let timeoutId: NodeJS.Timeout;
   
-  const throttledSet: typeof set = (...args) => {
+  const throttledSet = (partial: any, replace?: any, action?: any) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      set(...args);
+      set(partial, replace, action);
     }, delay);
   };
 
-  return f(throttledSet, get, store);
+  return f(throttledSet as any, get, store);
 };
 
 // Debounce middleware
@@ -141,17 +141,17 @@ export const debounce = <T extends unknown>(
   f: StateCreator<T>,
   delay: number = 300,
   name?: string
-) => (set, get, store) => {
+) => (set: any, get: any, store: any) => {
   let timeoutId: NodeJS.Timeout;
   
-  const debouncedSet: typeof set = (...args) => {
+  const debouncedSet = (partial: any, replace?: any, action?: any) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
-      set(...args);
+      set(partial, replace, action);
     }, delay);
   };
 
-  return f(debouncedSet, get, store);
+  return f(debouncedSet as any, get, store);
 };
 
 // Combine multiple middlewares
@@ -176,7 +176,7 @@ export const createStore = <T extends unknown>(
     validation?: (state: T) => boolean | string;
   } = {}
 ) => {
-  let store = f;
+  let store: any = f;
 
   // Add validation if provided
   if (options.validation) {
@@ -200,13 +200,13 @@ export const createStore = <T extends unknown>(
 
   // Add devtools in development
   if (options.devtools && process.env.NODE_ENV === 'development') {
-    store = devtools(store, { name: options.name });
+    store = devtools(store, { name: options.name || 'store' });
   }
 
   // Add persistence
   if (options.persist) {
     store = persist(store, {
-      name: options.persistKey || options.name,
+      name: options.persistKey || options.name || 'store',
       partialize: (state) => state,
     });
   }
@@ -221,13 +221,13 @@ export const createStoreEnhancer = () => {
   return <T extends unknown>(
     f: StateCreator<T>,
     name?: string
-  ) => (set, get, store) => {
+  ) => (set: any, get: any, store: any) => {
     if (name) {
       stores.set(name, { set, get, store });
     }
     
-    const enhancedSet: typeof set = (...args) => {
-      set(...args);
+    const enhancedSet = (partial: any, replace?: any, action?: any) => {
+      set(partial, replace, action);
       
       // Notify other stores if needed
       stores.forEach((otherStore, storeName) => {
@@ -237,7 +237,7 @@ export const createStoreEnhancer = () => {
       });
     };
     
-    return f(enhancedSet, get, store);
+    return f(enhancedSet as any, get, store);
   };
 };
 
@@ -246,9 +246,9 @@ export const sync = <T extends unknown>(
   f: StateCreator<T>,
   syncKeys: string[],
   name?: string
-) => (set, get, store) => {
-  const syncedSet: typeof set = (...args) => {
-    set(...args);
+) => (set: any, get: any, store: any) => {
+  const syncedSet = (partial: any, replace?: any, action?: any) => {
+    set(partial, replace, action);
     
     // Sync to localStorage or other storage
     if (typeof window !== 'undefined') {
@@ -264,5 +264,5 @@ export const sync = <T extends unknown>(
     }
   };
 
-  return f(syncedSet, get, store);
+  return f(syncedSet as any, get, store);
 }; 
