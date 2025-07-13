@@ -161,6 +161,83 @@ export default function ProfilePage() {
     return <ProfileError error={error} onRetry={fetchProfileData} />;
   }
 
+  // Show admin-specific message for booking-related content
+  if (user?.role === 'admin' && activeTab !== 'profile') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center space-x-6">
+              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
+                <FaUser className="w-12 h-12" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold">{profile?.name || user?.username}</h1>
+                <p className="text-blue-100 text-lg">Administrator</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 bg-white rounded-xl p-1 shadow-sm mb-8">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'profile'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <FaUser className="inline mr-2" />
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveTab('stats')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'stats'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <FaStar className="inline mr-2" />
+              Statistics
+            </button>
+            <button
+              onClick={() => setActiveTab('activity')}
+              className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+                activeTab === 'activity'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <FaCalendarAlt className="inline mr-2" />
+              Activity
+            </button>
+          </div>
+
+          {/* Admin Restriction Message */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+            <div className="text-6xl mb-4">🚫</div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Admin Access Restricted</h2>
+            <p className="text-gray-600 text-lg mb-6">
+              {activeTab === 'stats' 
+                ? 'Booking statistics are not available for admin accounts. Admins manage the platform rather than make bookings.'
+                : 'Booking activity is not available for admin accounts. Admins manage the platform rather than make bookings.'
+              }
+            </p>
+            <p className="text-sm text-gray-500">
+              Use the Profile tab to manage your admin account settings.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Hero Section */}

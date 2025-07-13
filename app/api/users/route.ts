@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '../mongodb';
+import { ObjectId } from 'mongodb';
 
 const COLLECTION = 'users';
 
@@ -10,7 +11,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (id) {
-      const user = await db.collection(COLLECTION).findOne({ id: Number(id) });
+      let user = await db.collection(COLLECTION).findOne({ id: Number(id) });
+      if (!user && ObjectId.isValid(id)) {
+        user = await db.collection(COLLECTION).findOne({ _id: new ObjectId(id) });
+      }
       if (!user) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
@@ -62,7 +66,12 @@ export async function PUT(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
-    const user = await db.collection(COLLECTION).findOne({ id: Number(id) });
+    let user = await db.collection(COLLECTION).findOne({ id: Number(id) });
+    let filter: any = { id: Number(id) };
+    if (!user && ObjectId.isValid(id)) {
+      user = await db.collection(COLLECTION).findOne({ _id: new ObjectId(id) });
+      filter = { _id: new ObjectId(id) };
+    }
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -71,7 +80,7 @@ export async function PUT(request: NextRequest) {
       ...body,
       updatedAt: new Date().toISOString(),
     };
-    await db.collection(COLLECTION).updateOne({ id: Number(id) }, { $set: updatedUser });
+    await db.collection(COLLECTION).updateOne(filter, { $set: updatedUser });
     return NextResponse.json(updatedUser);
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -87,11 +96,16 @@ export async function DELETE(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
-    const user = await db.collection(COLLECTION).findOne({ id: Number(id) });
+    let user = await db.collection(COLLECTION).findOne({ id: Number(id) });
+    let filter: any = { id: Number(id) };
+    if (!user && ObjectId.isValid(id)) {
+      user = await db.collection(COLLECTION).findOne({ _id: new ObjectId(id) });
+      filter = { _id: new ObjectId(id) };
+    }
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    await db.collection(COLLECTION).deleteOne({ id: Number(id) });
+    await db.collection(COLLECTION).deleteOne(filter);
     return NextResponse.json({ message: 'User deleted successfully' });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

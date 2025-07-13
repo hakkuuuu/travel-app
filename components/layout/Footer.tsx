@@ -43,8 +43,8 @@ const Footer = () => {
                 <img
                   src="/logo.png"
                   alt="Travelis Logo"
-                  className="h-10 w-auto rounded-xl"
-                  style={{ maxHeight: 40 }}
+                  className="h-12 w-auto rounded-xl"
+                  style={{ maxHeight: 48 }}
                 />
                 <span className="sr-only">Travelis</span>
               </Link>

@@ -1,7 +1,7 @@
 import Card from '@/components/ui/Card';
 import { UserStats } from '@/constants';
 import { formatMemberSince } from '@/lib/utils';
-import { FaMapMarkedAlt, FaStar, FaCalendarAlt, FaBed, FaClock, FaTrophy } from 'react-icons/fa';
+import { FaMapMarkedAlt, FaStar, FaCalendarAlt, FaBed, FaClock, FaTrophy, FaDollarSign } from 'react-icons/fa';
 
 interface ProfileStatsProps {
   stats: UserStats | null;
@@ -9,6 +9,15 @@ interface ProfileStatsProps {
 
 export default function ProfileStats({ stats }: ProfileStatsProps) {
   if (!stats) return null;
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
 
   const statItems = [
     {
@@ -26,6 +35,14 @@ export default function ProfileStats({ stats }: ProfileStatsProps) {
       color: 'text-green-600',
       bgColor: 'bg-green-50',
       description: 'Adventures booked'
+    },
+    {
+      icon: FaDollarSign,
+      label: 'Total Spent',
+      value: formatCurrency(stats.totalSpent),
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-50',
+      description: 'Investment in adventures'
     },
     {
       icon: FaStar,
@@ -91,13 +108,31 @@ export default function ProfileStats({ stats }: ProfileStatsProps) {
           ))}
         </div>
         
-        {stats.favoriteDestination && (
+        {stats.favoriteDestination && stats.favoriteDestination !== 'No destinations visited yet' && (
           <div className="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl border border-yellow-200">
             <div className="flex items-center">
               <FaStar className="w-5 h-5 text-yellow-600 mr-3" />
               <div>
                 <h4 className="font-semibold text-gray-900">Favorite Destination</h4>
                 <p className="text-sm text-gray-600">{stats.favoriteDestination}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {stats.lastBooking && (
+          <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+            <div className="flex items-center">
+              <FaCalendarAlt className="w-5 h-5 text-green-600 mr-3" />
+              <div>
+                <h4 className="font-semibold text-gray-900">Last Booking</h4>
+                <p className="text-sm text-gray-600">
+                  {new Date(stats.lastBooking).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </p>
               </div>
             </div>
           </div>

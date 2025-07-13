@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import BookingForm from '@/components/features/destinations/BookingForm';
 
 interface Destination {
   id: number;
@@ -48,13 +48,7 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
   const [destination, setDestination] = useState<Destination | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [nights, setNights] = useState(1);
-  const [guests, setGuests] = useState(1);
-  const [isBooking, setIsBooking] = useState(false);
   const [id, setId] = useState<string>('');
-  const { user } = useAuth();
-  const router = useRouter();
 
   useEffect(() => {
     async function getParams() {
@@ -84,43 +78,9 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
     fetchDestination();
   }, [id]);
 
-  const totalPrice = parseInt(destination?.price.replace('$', '').replace('/night', '') || '0') * nights;
-
-  const handleBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedDate) {
-      alert('Please select a check-in date');
-      return;
-    }
-    setIsBooking(true);
-    try {
-      const checkOut = new Date(selectedDate);
-      checkOut.setDate(checkOut.getDate() + nights);
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: user?.username,
-          campsiteId: destination?.id.toString(),
-          campsiteName: destination?.name,
-          checkIn: selectedDate,
-          checkOut: checkOut.toISOString().split('T')[0],
-          guests,
-          totalPrice: totalPrice + 5
-        })
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert('Booking confirmed! Check your profile for details.');
-        router.push('/profile');
-      } else {
-        alert(data.message || 'Booking failed. Please try again.');
-      }
-    } catch (error) {
-      alert('An error occurred. Please try again.');
-    } finally {
-      setIsBooking(false);
-    }
+  const handleBookingSuccess = () => {
+    // This will be called when booking is successful
+    console.log('Booking successful!');
   };
 
   if (loading) {
@@ -249,85 +209,10 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
 
           {/* Booking Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-lg sticky top-8">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  {destination?.price}
-                </h3>
-                <p className="text-gray-600">per night</p>
-              </div>
-
-              <form onSubmit={handleBooking} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Check-in Date
-                  </label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Number of Nights
-                  </label>
-                  <select
-                    value={nights}
-                    onChange={(e) => setNights(Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7].map(n => (
-                      <option key={n} value={n}>{n} night{n !== 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Number of Guests
-                  </label>
-                  <select
-                    value={guests}
-                    onChange={(e) => setGuests(Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
-                  >
-                    {[1, 2, 3, 4, 5, 6].map(g => (
-                      <option key={g} value={g}>{g} guest{g !== 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="border-t pt-4">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">
-                      ${parseInt(destination?.price.replace('$', '').replace('/night', '') || '0')} × {nights} nights
-                    </span>
-                    <span className="text-gray-900">${totalPrice}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Service fee</span>
-                    <span className="text-gray-900">$5</span>
-                  </div>
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span className="text-gray-900">Total</span>
-                    <span className="text-gray-900">${totalPrice + 5}</span>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isBooking}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
-                >
-                  {isBooking ? 'Booking...' : 'Book Now'}
-                </button>
-              </form>
-            </div>
+            <BookingForm 
+              destination={destination} 
+              onBookingSuccess={handleBookingSuccess}
+            />
           </div>
         </div>
       </div>

@@ -266,7 +266,7 @@ export default function UserForm({ onSubmit, onCancel, isLoading, error, success
 
       {/* Status Messages */}
       {error && <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200">{error}</div>}
-      {success && <div className="text-green-600 text-sm bg-green-50 p-2 rounded border border-green-200">{success}</div>}
+      {/* Removed success message to avoid duplicate feedback */}
 
       {/* Actions */}
       <div className="flex justify-end gap-3 pt-4">

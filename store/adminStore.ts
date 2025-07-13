@@ -28,6 +28,23 @@ export interface AdminDestination {
   updatedAt?: string;
 }
 
+export interface AdminBooking {
+  id: string;
+  bookingId: string;
+  destinationName: string;
+  destinationLocation: string;
+  destinationImage: string;
+  userName: string;
+  userEmail: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  status: string;
+  totalPrice: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AdminStats {
   totalUsers: number;
   totalDestinations: number;
@@ -45,6 +62,7 @@ export interface AdminState {
   // State
   users: AdminUser[];
   destinations: AdminDestination[];
+  bookings: AdminBooking[];
   stats: AdminStats | null;
   isLoading: boolean;
   error: string | null;
@@ -62,6 +80,9 @@ export interface AdminState {
   updateDestination: (id: number, updates: Partial<AdminDestination>) => Promise<boolean>;
   deleteDestination: (id: number) => Promise<boolean>;
   
+  // Booking management
+  fetchBookings: () => Promise<void>;
+  
   // Stats
   fetchStats: () => Promise<void>;
   
@@ -76,6 +97,7 @@ export const useAdminStore = create<AdminState>()(
       // Initial state
       users: [],
       destinations: [],
+      bookings: [],
       stats: null,
       isLoading: false,
       error: null,
@@ -83,10 +105,14 @@ export const useAdminStore = create<AdminState>()(
       // User management actions
       fetchUsers: async () => {
         set({ isLoading: true, error: null });
-        
         try {
           const response = await apiCall<AdminUser[]>('/api/users');
-          set({ users: response, isLoading: false });
+          // Ensure each user has an 'id' property
+          const usersWithId = response.map(u => ({
+            ...u,
+            id: (u as any).id || (u as any)._id || (u as any).userId
+          }));
+          set({ users: usersWithId, isLoading: false });
         } catch (error) {
           const errorMessage = 'Failed to fetch users';
           set({ error: errorMessage, isLoading: false });
@@ -261,6 +287,20 @@ export const useAdminStore = create<AdminState>()(
           set({ error: errorMessage, isLoading: false });
           showErrorToast(errorMessage);
           return false;
+        }
+      },
+
+      // Booking management actions
+      fetchBookings: async () => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          const response = await apiCall<AdminBooking[]>('/api/admin/bookings');
+          set({ bookings: response, isLoading: false });
+        } catch (error) {
+          const errorMessage = 'Failed to fetch bookings';
+          set({ error: errorMessage, isLoading: false });
+          showErrorToast(errorMessage);
         }
       },
 

@@ -36,7 +36,6 @@ export default function AdminDestinationsPage() {
     if (success) {
       closeModal();
       setEditingDestination(null);
-      toast.success('Destination added successfully! 🎉');
     }
   };
 
@@ -47,7 +46,6 @@ export default function AdminDestinationsPage() {
     if (success) {
       closeModal();
       setEditingDestination(null);
-      toast.success('Destination updated successfully! ✨');
     }
   };
 

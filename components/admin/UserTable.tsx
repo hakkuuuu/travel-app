@@ -52,12 +52,18 @@ export default function UserTable({ users, onEdit, onDelete, isLoading, onSort, 
     {
       type: 'edit',
       label: 'Edit',
-      onClick: onEdit
+      onClick: (user) => {
+        if (user.role === 'admin' || user.username === 'admin12345') return;
+        onEdit(user);
+      },
     },
     {
       type: 'delete',
       label: 'Delete',
-      onClick: onDelete
+      onClick: (user) => {
+        if (user.role === 'admin' || user.username === 'admin12345') return;
+        onDelete(user);
+      }
     }
   ];
 

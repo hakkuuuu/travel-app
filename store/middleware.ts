@@ -15,7 +15,7 @@ type Logger = <
 export const logger: Logger = (f, name) => (set, get, store) => {
   const loggedSet = (partial: any, replace?: any, action?: any) => {
     set(partial, replace, action);
-    console.log(`${name || 'store'}`, get());
+          // Store state logged
   };
   return f(loggedSet as any, get, store);
 };
@@ -29,7 +29,7 @@ export const errorBoundary = <T extends unknown>(
     try {
       set(partial, replace, action);
     } catch (error) {
-      console.error(`Error in ${name || 'store'} set:`, error);
+      // Error in store set
       // You could dispatch to an error store here
     }
   };
@@ -71,7 +71,7 @@ export const performance = <T extends unknown>(
     const end = (globalThis as any).performance?.now?.() || Date.now();
     
     if (end - start > 16) { // Longer than one frame
-      console.warn(`Slow state update in ${name || 'store'}: ${end - start}ms`);
+              // Slow state update detected
     }
   };
 

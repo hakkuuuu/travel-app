@@ -52,6 +52,7 @@ interface User {
 interface DashboardStatsProps {
   destinations: Destination[];
   users: User[];
+  bookings?: any[];
 }
 
 const COLORS = [
@@ -63,10 +64,11 @@ const COLORS = [
   '#06B6D4', // Cyan
 ];
 
-export default function DashboardStats({ destinations, users }: DashboardStatsProps) {
+export default function DashboardStats({ destinations, users, bookings = [] }: DashboardStatsProps) {
   // Calculate statistics
   const destinationsCount = destinations.length;
   const usersCount = users.length;
+  const bookingsCount = bookings.length;
   const totalReviews = destinations.reduce((acc, dest) => acc + (dest.reviews?.length || 0), 0);
   
   // Average rating across all destinations
@@ -128,32 +130,32 @@ export default function DashboardStats({ destinations, users }: DashboardStatsPr
       description: 'Active community members'
     },
     { 
+      label: 'Total Bookings', 
+      value: bookingsCount, 
+      color: COLORS[2],
+      icon: '📋',
+      description: 'Confirmed reservations'
+    },
+    { 
       label: 'Total Reviews', 
       value: totalReviews, 
-      color: COLORS[2],
+      color: COLORS[3],
       icon: '⭐',
       description: 'User feedback received'
     },
     { 
       label: 'Avg. Rating', 
       value: averageRating, 
-      color: COLORS[3],
+      color: COLORS[4],
       icon: '📊',
       description: 'Overall satisfaction score'
     },
     { 
       label: 'Avg. Price', 
       value: `$${averagePrice}`, 
-      color: COLORS[4],
+      color: COLORS[5],
       icon: '💰',
       description: 'Per night average'
-    },
-    { 
-      label: 'Engaged Users', 
-      value: usersWithReviews, 
-      color: COLORS[5],
-      icon: '💬',
-      description: 'Users who left reviews'
     },
   ];
 

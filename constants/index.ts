@@ -45,6 +45,7 @@ export interface UserStats {
   averageRating: number;
   favoriteDestination: string;
   totalNights: number;
+  totalSpent: number;
   memberSince: string;
   lastBooking?: string;
 }
@@ -52,29 +53,42 @@ export interface UserStats {
 export interface RecentActivity {
   _id?: string;
   userId: string;
+  username?: string;
   type: 'booking' | 'review' | 'login' | 'profile_update' | 'campsite_visit';
   title: string;
   description: string;
   date: string;
   icon: string;
   metadata?: {
+    destinationId?: string;
+    destinationName?: string;
     campsiteId?: string;
     campsiteName?: string;
     rating?: number;
     bookingId?: string;
+    nights?: number;
+    guests?: number;
+    totalPrice?: number;
   };
 }
 
 export interface UserBooking {
   _id?: string;
   userId: string;
-  campsiteId: string;
-  campsiteName: string;
-  checkIn: string;
-  checkOut: string;
+  username?: string;
+  destinationId: string;
+  destinationName: string;
+  destinationImage?: string;
+  startDate: string;
+  endDate: string;
+  nights: number;
   guests: number;
   status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
   totalPrice: number;
+  specialRequests?: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
+  bookingReference?: string;
   createdAt: string;
   updatedAt: string;
 }

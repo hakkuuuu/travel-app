@@ -66,18 +66,17 @@ export default function AdminUsersPage() {
 
   const handleFormSubmit = async (formData: any) => {
     if (editingUser) {
+      console.log('Updating user with ID:', editingUser.id, editingUser);
       const success = await updateUser(editingUser.id, formData);
       if (success) {
         closeModal();
         setEditingUser(null);
-        toast.success('User updated successfully! ✨');
       }
     } else {
       const success = await createUser(formData);
       if (success) {
         closeModal();
         setEditingUser(null);
-        toast.success('User created successfully! 🎉');
       }
     }
   };

@@ -6,6 +6,7 @@ import DestinationForm from '@/components/admin/DestinationForm';
 import DestinationList from '@/components/admin/DestinationList';
 import UserForm from '@/components/admin/UserForm';
 import UserTable, { User } from '@/components/admin/UserTable';
+import BookingTable from '@/components/admin/BookingTable';
 import Modal from '@/components/ui/Modal';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import Button from '@/components/ui/Button';
@@ -29,17 +30,19 @@ interface Destination {
 
 export default function AdminPage() {
   // Tabs
-  const [tab, setTab] = useState<'dashboard' | 'destinations' | 'users'>('dashboard');
+  const [tab, setTab] = useState<'dashboard' | 'destinations' | 'users' | 'bookings'>('dashboard');
 
   // Admin store
   const {
     destinations,
     users,
+    bookings,
     stats,
     isLoading,
     error,
     fetchDestinations,
     fetchUsers,
+    fetchBookings,
     fetchStats,
     createDestination,
     updateDestination,
@@ -67,12 +70,15 @@ export default function AdminPage() {
       fetchDestinations();
     } else if (tab === 'users') {
       fetchUsers();
+    } else if (tab === 'bookings') {
+      fetchBookings();
     } else if (tab === 'dashboard') {
       fetchDestinations();
       fetchUsers();
+      fetchBookings();
       fetchStats();
     }
-  }, [tab, fetchDestinations, fetchUsers, fetchStats]);
+  }, [tab, fetchDestinations, fetchUsers, fetchBookings, fetchStats]);
 
   // Destination handlers
   const handleDestinationSubmit = async (formData: any) => {
@@ -84,7 +90,6 @@ export default function AdminPage() {
     if (success) {
       closeModal();
       setEditingDestination(null);
-      toast.success('Destination created successfully! 🎉');
     }
   };
 
@@ -99,7 +104,6 @@ export default function AdminPage() {
     if (success) {
       closeModal();
       setEditingDestination(null);
-      toast.success('Destination updated successfully! ✨');
     }
   };
 
@@ -131,7 +135,6 @@ export default function AdminPage() {
     if (success) {
       closeModal();
       setEditingUser(null);
-      toast.success('User created successfully! 🎉');
     }
   };
 
@@ -142,7 +145,6 @@ export default function AdminPage() {
     if (success) {
       closeModal();
       setEditingUser(null);
-      toast.success('User updated successfully! ✨');
     }
   };
 
@@ -190,6 +192,12 @@ export default function AdminPage() {
     toast.loading('Refreshing users...');
     await fetchUsers();
     toast.success('Users refreshed! 🔄');
+  };
+
+  const handleRefreshBookings = async () => {
+    toast.loading('Refreshing bookings...');
+    await fetchBookings();
+    toast.success('Bookings refreshed! 🔄');
   };
 
   return (
@@ -245,6 +253,16 @@ export default function AdminPage() {
             >
               Users
             </button>
+            <button
+              onClick={() => setTab('bookings')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                tab === 'bookings'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Bookings
+            </button>
           </nav>
         </div>
       </div>
@@ -257,6 +275,7 @@ export default function AdminPage() {
             <DashboardStats 
               destinations={destinations}
               users={users}
+              bookings={bookings}
             />
             <RecentActivity 
               destinations={destinations}
@@ -354,6 +373,29 @@ export default function AdminPage() {
               users={users}
               onEdit={openUserModal}
               onDelete={handleUserDeleteClick}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
+        {/* Bookings Tab */}
+        {tab === 'bookings' && (
+          <div className="space-y-8">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Bookings</h2>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleRefreshBookings}
+                  variant="outline"
+                  icon={<FaSync className="w-4 h-4" />}
+                  loading={isLoading}
+                >
+                  Refresh
+                </Button>
+              </div>
+            </div>
+            
+            <BookingTable
+              bookings={bookings}
               isLoading={isLoading}
             />
           </div>

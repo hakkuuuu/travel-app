@@ -17,39 +17,49 @@ export async function POST(req: NextRequest) {
     if (user) {
       // Debug: print user credentials
       console.log('User login:', { username: user.username, email: user.email, role: user.role });
+      
+      // Update last login time
+      const now = new Date().toISOString();
+      await users.updateOne(
+        { _id: user._id },
+        { $set: { lastLogin: now, updatedAt: now } }
+      );
+
+      // Create login activity
+      await db.collection('activity').insertOne({
+        userId: user._id.toString(),
+        username: user.username,
+        type: 'login',
+        title: 'User Login',
+        description: 'Successfully logged into the platform',
+        date: now,
+        icon: '🔐',
+        createdAt: now
+      });
+
       // Create response with success
-      const response = NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         message: 'Login successful',
-        user: { username: user.username, name: user.name, email: user.email, role: user.role || 'user' }
+        user: {
+          username: user.username,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          avatar: user.avatar || '/user.svg'
+        }
       });
-      
-      // Set authentication cookie
-      response.cookies.set('loggedIn', 'true', {
-        httpOnly: false, // Allow client-side access
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 // 7 days
-      });
-      
-      response.cookies.set('username', user.username, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 // 7 days
-      });
-      
-      response.cookies.set('role', user.role || 'user', {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 // 7 days
-      });
-      
-      return response;
+    } else {
+      return NextResponse.json(
+        { success: false, message: 'Invalid username or password' },
+        { status: 401 }
+      );
     }
-    return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
-  } catch (err) {
-    return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
+  } catch (error) {
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { success: false, message: 'Server error' },
+      { status: 500 }
+    );
   }
 } 
