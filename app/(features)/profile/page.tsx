@@ -188,12 +188,12 @@ export default function ProfilePage() {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Tab Navigation */}
+          {/* Tab Navigation (no type narrowing) */}
           <div className="flex space-x-1 bg-white rounded-xl p-1 shadow-sm mb-8">
             <button
               onClick={() => setActiveTab('profile')}
               className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'profile'
+                (activeTab as 'profile' | 'stats' | 'activity') === 'profile'
                   ? 'bg-blue-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
@@ -204,7 +204,7 @@ export default function ProfilePage() {
             <button
               onClick={() => setActiveTab('stats')}
               className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'stats'
+                (activeTab as 'profile' | 'stats' | 'activity') === 'stats'
                   ? 'bg-blue-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
@@ -215,7 +215,7 @@ export default function ProfilePage() {
             <button
               onClick={() => setActiveTab('activity')}
               className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                activeTab === 'activity'
+                (activeTab as 'profile' | 'stats' | 'activity') === 'activity'
                   ? 'bg-blue-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
