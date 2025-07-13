@@ -162,7 +162,13 @@ export default function ProfilePage() {
   }
 
   // Show admin-specific message for booking-related content
-  if (user?.role === 'admin' && activeTab !== 'profile') {
+  if (user?.role === 'admin' && (activeTab === 'stats' || activeTab === 'activity')) {
+    let adminMessage: string = '';
+    if (activeTab === 'stats') {
+      adminMessage = 'Booking statistics are not available for admin accounts. Admins manage the platform rather than make bookings.';
+    } else if (activeTab === 'activity') {
+      adminMessage = 'Booking activity is not available for admin accounts. Admins manage the platform rather than make bookings.';
+    }
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
         {/* Hero Section */}
@@ -223,12 +229,7 @@ export default function ProfilePage() {
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div className="text-6xl mb-4">🚫</div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Admin Access Restricted</h2>
-            <p className="text-gray-600 text-lg mb-6">
-              {activeTab === 'stats' 
-                ? 'Booking statistics are not available for admin accounts. Admins manage the platform rather than make bookings.'
-                : 'Booking activity is not available for admin accounts. Admins manage the platform rather than make bookings.'
-              }
-            </p>
+            <p className="text-gray-600 text-lg mb-6">{adminMessage}</p>
             <p className="text-sm text-gray-500">
               Use the Profile tab to manage your admin account settings.
             </p>
