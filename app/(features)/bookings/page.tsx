@@ -7,12 +7,16 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import { UserBooking } from '@/constants';
 import { FaCalendarAlt, FaUsers, FaMapMarkerAlt, FaDollarSign, FaClock, FaCheckCircle, FaTimesCircle, FaTrash } from 'react-icons/fa';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 
 export default function BookingsPage() {
   const { user } = useAuth();
   const [bookings, setBookings] = useState<UserBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelingBookingId, setCancelingBookingId] = useState<string | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   useEffect(() => {
     if (user?.username) {
@@ -109,8 +113,31 @@ export default function BookingsPage() {
 
   // Cancel booking handler (dummy for now)
   const handleCancelBooking = (bookingId: string) => {
-    // TODO: Implement cancel booking logic
-    alert('Cancel booking: ' + bookingId);
+    setCancelingBookingId(bookingId);
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!cancelingBookingId) return;
+    setCancelLoading(true);
+    try {
+      const response = await fetch(`/api/bookings/${cancelingBookingId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setCancelDialogOpen(false);
+        setCancelingBookingId(null);
+        fetchBookings();
+      } else {
+        alert(data.message || 'Failed to cancel booking');
+      }
+    } catch (err) {
+      alert('Failed to cancel booking. Please try again.');
+    } finally {
+      setCancelLoading(false);
+    }
   };
 
   if (loading) {
@@ -272,6 +299,17 @@ export default function BookingsPage() {
           </div>
         )}
       </div>
+      <ConfirmationDialog
+        isOpen={cancelDialogOpen}
+        onClose={() => { setCancelDialogOpen(false); setCancelingBookingId(null); }}
+        onConfirm={handleCancelConfirm}
+        title="Cancel Booking"
+        message="Are you sure you want to cancel this booking? This action cannot be undone."
+        confirmText="Yes, Cancel"
+        cancelText="No, Keep Booking"
+        type="danger"
+        loading={cancelLoading}
+      />
     </ProtectedRoute>
   );
 } 

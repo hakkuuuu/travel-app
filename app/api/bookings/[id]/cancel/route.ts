@@ -111,4 +111,13 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+// Support POST as an alias for PUT for cancellation
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  // Call the same logic as PUT
+  return PUT(req, context);
 } 
