@@ -6,6 +6,19 @@ import DestinationForm from '@/components/admin/DestinationForm';
 import DestinationList from '@/components/admin/DestinationList';
 import { AdminDestination } from '@/store/adminStore';
 
+// Add Destination type (should match DestinationList)
+interface Destination {
+  id: number;
+  name: string;
+  location: string;
+  price: string;
+  image: string;
+  description: string;
+  amenities: string[];
+  features: string[];
+  rating?: number;
+}
+
 interface AdminDestinationsTabProps {
   destinations: AdminDestination[];
   isLoading: boolean;
@@ -35,6 +48,21 @@ export default function AdminDestinationsTab({
   onSubmitDestination,
   onEditDestinationSubmit
 }: AdminDestinationsTabProps) {
+  // Adapter: AdminDestination -> Destination
+  const toDestination = (admin: AdminDestination): Destination => ({
+    id: admin.id,
+    name: admin.name,
+    location: admin.location,
+    price: admin.price,
+    image: admin.image,
+    description: admin.description,
+    amenities: admin.amenities,
+    features: admin.features,
+    rating: admin.rating,
+  });
+  // Adapter: Destination -> AdminDestination
+  const findAdminDestination = (dest: Destination) => destinations.find(d => d.id === dest.id)!;
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -69,10 +97,10 @@ export default function AdminDestinationsTab({
       </EntityFormModal>
       
       <DestinationList 
-        destinations={destinations}
+        destinations={destinations.map(toDestination)}
         isLoading={isLoading}
-        onEdit={onEditDestination}
-        onDelete={onDeleteDestination}
+        onEdit={d => onEditDestination(findAdminDestination(d))}
+        onDelete={d => onDeleteDestination(findAdminDestination(d))}
       />
     </div>
   );
