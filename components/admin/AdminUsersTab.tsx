@@ -67,7 +67,8 @@ export default function AdminUsersTab({
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Users</h2>
-        <div className="flex gap-2">
+        {/* Desktop buttons */}
+        <div className="hidden md:flex gap-2">
           <Button
             onClick={onAddUser}
             variant="success"
@@ -78,6 +79,17 @@ export default function AdminUsersTab({
           <RefreshButton onClick={onRefresh} loading={isLoading}>
             Refresh
           </RefreshButton>
+        </div>
+        {/* Mobile icon buttons */}
+        <div className="flex md:hidden gap-2">
+          <button
+            onClick={onAddUser}
+            className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-400"
+            title="Add User"
+          >
+            <FaPlus className="w-5 h-5" />
+          </button>
+          <RefreshButton onClick={onRefresh} loading={isLoading} iconOnly className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-400" />
         </div>
       </div>
       

@@ -15,9 +15,6 @@ export async function POST(req: NextRequest) {
       password 
     });
     if (user) {
-      // Debug: print user credentials
-      console.log('User login:', { username: user.username, email: user.email, role: user.role });
-      
       // Update last login time
       const now = new Date().toISOString();
       await users.updateOne(

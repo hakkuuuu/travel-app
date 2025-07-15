@@ -5,6 +5,7 @@ import type { UserBooking } from '@/constants';
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const username = searchParams.get('username');
+  const destinationId = searchParams.get('destinationId');
 
   if (!username) {
     return NextResponse.json(
@@ -26,9 +27,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get user's bookings
+    // Build query
+    const query: any = { userId: user._id.toString() };
+    if (destinationId) {
+      query.destinationId = destinationId.toString();
+    }
+
+    // Get user's bookings (optionally filtered by destination)
     const bookings = await db.collection('bookings')
-      .find({ userId: user._id.toString() })
+      .find(query)
       .sort({ createdAt: -1 })
       .toArray();
 

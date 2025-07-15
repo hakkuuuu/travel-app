@@ -242,23 +242,23 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white py-12">
+      <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
             <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center">
               <FaUser className="w-12 h-12" />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold">{profile?.name || user?.username}</h1>
-              <p className="text-blue-100 text-lg">Travel enthusiast & adventure seeker</p>
-              <div className="flex items-center space-x-4 mt-2">
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-4xl font-bold">{profile?.name || user?.username}</h1>
+              <p className="text-blue-100 text-base sm:text-lg">Travel enthusiast & adventure seeker</p>
+              <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
                 <span className="flex items-center space-x-1">
                   <FaCalendarAlt className="w-4 h-4" />
-                  <span>Member since {formatMemberSince(profile?.memberSince || '')}</span>
+                  <span className="text-xs sm:text-sm">Member since {formatMemberSince(profile?.memberSince || '')}</span>
                 </span>
                 <span className="flex items-center space-x-1">
                   <FaMapMarkedAlt className="w-4 h-4" />
-                  <span>{stats?.totalDestinationsVisited || 0} destinations</span>
+                  <span className="text-xs sm:text-sm">{stats?.totalDestinationsVisited || 0} destinations</span>
                 </span>
               </div>
             </div>
@@ -267,12 +267,12 @@ export default function ProfilePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-white rounded-xl p-1 shadow-sm mb-8">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 bg-white rounded-xl p-1 shadow-sm mb-6 sm:mb-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base whitespace-nowrap ${
               activeTab === 'profile'
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -283,7 +283,7 @@ export default function ProfilePage() {
           </button>
           <button
             onClick={() => setActiveTab('stats')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base whitespace-nowrap ${
               activeTab === 'stats'
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -294,7 +294,7 @@ export default function ProfilePage() {
           </button>
           <button
             onClick={() => setActiveTab('activity')}
-            className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base whitespace-nowrap ${
               activeTab === 'activity'
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -307,39 +307,37 @@ export default function ProfilePage() {
 
         {/* Tab Content */}
         {activeTab === 'profile' && (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Edit Controls */}
-            <div className="flex justify-end">
-              <div className="flex space-x-2">
-                {isEditing ? (
-                  <>
-                    <Button
-                      onClick={handleSaveClick}
-                      loading={saving}
-                      variant="success"
-                      icon={<FaSave className="w-4 h-4" />}
-                      disabled={!hasChanges}
-                    >
-                      Save Changes
-                    </Button>
-                    <Button
-                      onClick={handleCancelClick}
-                      variant="outline"
-                      icon={<FaTimes className="w-4 h-4" />}
-                    >
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
+            <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+              {isEditing ? (
+                <>
                   <Button
-                    onClick={() => setIsEditing(true)}
-                    variant="primary"
-                    icon={<FaEdit className="w-4 h-4" />}
+                    onClick={handleSaveClick}
+                    loading={saving}
+                    variant="success"
+                    icon={<FaSave className="w-4 h-4" />}
+                    disabled={!hasChanges}
                   >
-                    Edit Profile
+                    Save Changes
                   </Button>
-                )}
-              </div>
+                  <Button
+                    onClick={handleCancelClick}
+                    variant="outline"
+                    icon={<FaTimes className="w-4 h-4" />}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  variant="primary"
+                  icon={<FaEdit className="w-4 h-4" />}
+                >
+                  Edit Profile
+                </Button>
+              )}
             </div>
 
             {/* Profile Form */}
@@ -351,7 +349,7 @@ export default function ProfilePage() {
             />
 
             {/* Stats and Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               <ProfileStats stats={stats} />
               <RecentActivityList recentActivity={recentActivity} />
             </div>
@@ -359,15 +357,15 @@ export default function ProfilePage() {
         )}
 
         {activeTab === 'stats' && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Your Travel Journey</h2>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-8 text-center">Your Travel Journey</h2>
             <ProfileStats stats={stats} />
           </div>
         )}
 
         {activeTab === 'activity' && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Recent Adventures</h2>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-8 text-center">Recent Adventures</h2>
             <RecentActivityList recentActivity={recentActivity} />
           </div>
         )}

@@ -55,15 +55,6 @@ export async function GET(req: NextRequest) {
       { $sort: { createdAt: -1 } }
     ]).toArray();
 
-    // Debug: log the raw bookings aggregation result
-    console.log('Raw bookings aggregation result:', bookings);
-
-    // Also log users and destinations for cross-checking
-    const users = await db.collection('users').find({}).toArray();
-    const destinations = await db.collection('destinations').find({}).toArray();
-    console.log('All users:', users);
-    console.log('All destinations:', destinations);
-
     // Transform the data to match the expected format
     const transformedBookings = bookings.map(booking => ({
       id: booking._id.toString(),
@@ -81,9 +72,6 @@ export async function GET(req: NextRequest) {
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt
     }));
-
-    // Debug: log the transformed bookings
-    console.log('Transformed bookings:', transformedBookings);
 
     return NextResponse.json({ 
       success: true, 

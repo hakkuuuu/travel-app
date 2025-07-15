@@ -30,6 +30,19 @@ export default function BookingForm({ destination, onBookingSuccess }: BookingFo
   const { user } = useAuth();
   const router = useRouter();
   const [isBooking, setIsBooking] = React.useState(false);
+  const [hasCompletedBooking, setHasCompletedBooking] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!user?.username) return;
+    fetch(`/api/bookings?username=${user.username}&destinationId=${destination.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data)) {
+          const blocked = data.data.some((b: any) => b.status === 'completed' || b.status === 'confirmed');
+          setHasCompletedBooking(blocked);
+        }
+      });
+  }, [user, destination.id]);
 
   const basePrice = parseInt(destination.price.replace('$', '').replace('/night', '') || '0');
   const serviceFee = 5;
@@ -261,10 +274,14 @@ export default function BookingForm({ destination, onBookingSuccess }: BookingFo
           </div>
           <button
             type="submit"
-            className="w-full bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition mt-2"
-            disabled={isBooking}
+            className={`w-full font-semibold py-3 px-6 rounded-lg mt-2 ${
+              hasCompletedBooking
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+            disabled={hasCompletedBooking || isBooking}
           >
-            {isBooking ? 'Booking...' : 'Book Now'}
+            {hasCompletedBooking ? 'You booked this' : isBooking ? 'Booking...' : 'Book Now'}
           </button>
         </form>
       )}

@@ -70,12 +70,21 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                       className="w-full px-4 py-4 pl-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-lg"
                     />
                   </div>
+                  {/* Full button for md+ screens */}
                   <button
                     type="submit"
-                    className="bg-gradient-to-r from-green-500 to-blue-600 text-white font-semibold px-8 py-4 rounded-xl hover:from-green-600 hover:to-blue-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 text-lg flex items-center gap-2"
+                    className="hidden md:flex bg-gradient-to-r from-green-500 to-blue-600 text-white font-semibold px-8 py-4 rounded-xl hover:from-green-600 hover:to-blue-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 text-lg items-center gap-2"
                   >
-                    <Icon name="search" size="sm" />
+                    <Icon name="search" size="sm" className="text-white" />
                     Search
+                  </button>
+                  {/* Icon-only button for mobile */}
+                  <button
+                    type="submit"
+                    className="flex md:hidden items-center justify-center p-4 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-xl focus:ring-4 focus:ring-green-200"
+                    aria-label="Search"
+                  >
+                    <Icon name="search" size="md" className="text-white" />
                   </button>
                 </div>
               </div>

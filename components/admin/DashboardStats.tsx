@@ -191,80 +191,36 @@ export default function DashboardStats({ destinations, users, bookings = [] }: D
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Main Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {mainStats.map((stat, index) => (
-          <div key={stat.label} className="bg-white rounded-xl shadow p-6 border border-gray-100">
-            <div className="flex items-center justify-between">
+          <div key={stat.label} className="bg-white rounded-xl shadow p-4 sm:p-6 border border-gray-100 flex flex-col justify-between h-full">
+            <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
-                <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
+                <div className="text-lg sm:text-xl font-semibold text-gray-800">{stat.label}</div>
+                <div className="text-xs sm:text-sm text-gray-500">{stat.description}</div>
               </div>
-              <div className="text-3xl">{stat.icon}</div>
+              <span className="text-2xl sm:text-3xl" style={{ color: stat.color }}>{stat.icon}</span>
             </div>
+            <div className="mt-2 text-2xl sm:text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</div>
           </div>
         ))}
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Popular Destinations */}
-        <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Most Popular Destinations</h3>
-          <div className="h-64">
-            <Bar 
-              data={popularDestinationsData} 
-              options={{
-                plugins: { legend: { display: false } },
-                scales: { 
-                  y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                  x: { ticks: { maxRotation: 45 } }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }} 
-            />
-          </div>
+      {/* Charts Section (responsive grid) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white rounded-xl shadow p-4 sm:p-6 border border-gray-100">
+          <div className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Most Popular Destinations</div>
+          <Bar data={popularDestinationsData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={180} />
         </div>
-
-        {/* Top Rated Destinations */}
-        <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Highest Rated Destinations</h3>
-          <div className="h-64">
-            <Bar 
-              data={topRatedData} 
-              options={{
-                plugins: { legend: { display: false } },
-                scales: { 
-                  y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } },
-                  x: { ticks: { maxRotation: 45 } }
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }} 
-            />
-          </div>
+        <div className="bg-white rounded-xl shadow p-4 sm:p-6 border border-gray-100">
+          <div className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Top Rated Destinations</div>
+          <Bar data={topRatedData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={180} />
         </div>
-      </div>
-
-      {/* Popular Amenities */}
-      <div className="bg-white rounded-xl shadow p-6 border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Most Popular Amenities</h3>
-        <div className="h-64">
-          <Bar 
-            data={amenitiesData} 
-            options={{
-              plugins: { legend: { display: false } },
-              scales: { 
-                y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                x: { ticks: { maxRotation: 45 } }
-              },
-              responsive: true,
-              maintainAspectRatio: false,
-            }} 
-          />
+        <div className="bg-white rounded-xl shadow p-4 sm:p-6 border border-gray-100 md:col-span-2">
+          <div className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Top Amenities</div>
+          <Bar data={amenitiesData} options={{ responsive: true, plugins: { legend: { display: false } } }} height={180} />
         </div>
       </div>
 

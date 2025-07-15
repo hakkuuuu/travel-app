@@ -11,9 +11,18 @@ interface TabsProps {
   onTabChange: (tab: string) => void;
 }
 
+// Custom scrollbar styles
+const scrollbarStyle = {
+  scrollbarWidth: 'thin',
+  scrollbarColor: '#22c55e #e5e7eb', // green-500 on gray-200
+} as React.CSSProperties;
+
 export default function Tabs({ tabs, currentTab, onTabChange }: TabsProps) {
   return (
-    <nav className="flex space-x-8">
+    <nav
+      className="flex space-x-4 sm:space-x-8 overflow-x-auto whitespace-nowrap px-2"
+      style={scrollbarStyle}
+    >
       {tabs.map(tab => (
         <button
           key={tab.value}

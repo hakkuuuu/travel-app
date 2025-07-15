@@ -158,11 +158,11 @@ export default function BookingsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Bookings</h1>
-          <p className="text-gray-600">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">My Bookings</h1>
+          <p className="text-gray-600 text-sm sm:text-base">
             Manage and track all your travel reservations
           </p>
         </div>
@@ -173,8 +173,8 @@ export default function BookingsPage() {
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FaCalendarAlt className="w-10 h-10 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">No bookings yet</h3>
-            <p className="text-gray-600 mb-8">Start exploring destinations and make your first booking!</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">No bookings yet</h3>
+            <p className="text-gray-600 mb-8 text-sm sm:text-base">Start exploring destinations and make your first booking!</p>
             <a
               href="/destinations"
               className="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
@@ -184,8 +184,8 @@ export default function BookingsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            {/* Table Header */}
-            <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+            {/* Table Header (Desktop Only) */}
+            <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b border-gray-200 hidden md:block">
               <div className="grid grid-cols-12 gap-4 text-sm font-semibold text-gray-700">
                 <div className="col-span-3">Destination</div>
                 <div className="col-span-2">Dates</div>
@@ -197,10 +197,10 @@ export default function BookingsPage() {
               </div>
             </div>
 
-            {/* Table Body */}
-            <div className="divide-y divide-gray-200">
+            {/* Table Body (Desktop) */}
+            <div className="hidden md:block divide-y divide-gray-200">
               {bookings.map((booking) => (
-                <div key={booking._id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div key={booking._id} className="px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors">
                   <div className="grid grid-cols-12 gap-4 items-center">
                     {/* Destination */}
                     <div className="col-span-3">
@@ -289,6 +289,62 @@ export default function BookingsPage() {
                   {booking.specialRequests && (
                     <div className="mt-3 pt-3 border-t border-gray-100">
                       <p className="text-sm text-gray-600">
+                        <strong className="text-gray-900">Special Requests:</strong> {booking.specialRequests}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Card Layout (Mobile Only) */}
+            <div className="block md:hidden divide-y divide-gray-200">
+              {bookings.map((booking) => (
+                <div key={booking._id} className="px-4 py-4">
+                  <div className="flex items-center space-x-3 mb-2">
+                    {booking.destinationImage ? (
+                      <img
+                        src={booking.destinationImage}
+                        alt={booking.destinationName || 'Unknown Destination'}
+                        className="w-14 h-14 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-lg bg-gray-200 flex items-center justify-center text-gray-400 text-2xl font-bold">
+                        ?
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-base">{booking.destinationName || 'Unknown Destination'}</h3>
+                      <p className="text-xs text-gray-500">Ref: {booking.bookingReference || '-' }</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs text-gray-700 mb-2">
+                    <span className="flex items-center"><FaCalendarAlt className="w-4 h-4 mr-1 text-blue-500" />{formatDate(booking.startDate)} to {formatDate(booking.endDate)}</span>
+                    <span className="flex items-center"><FaUsers className="w-4 h-4 mr-1 text-blue-500" />{typeof booking.guests === 'number' && booking.guests > 0 ? booking.guests : '-'}</span>
+                    <span className="flex items-center"><FaMapMarkerAlt className="w-4 h-4 mr-1 text-red-500" />{getNights(booking)} nights</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs text-gray-700 mb-2">
+                    <span className="font-semibold text-gray-900">{typeof booking.totalPrice === 'number' ? formatCurrency(booking.totalPrice) : '-'}</span>
+                    <span className="text-gray-500">Booked {formatDate(booking.createdAt)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                      {getStatusIcon(booking.status)}
+                      <span className="ml-1 capitalize">{booking.status}</span>
+                    </span>
+                    {(booking.status === 'confirmed' || booking.status === 'pending') && (
+                      <button
+                        className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-colors border border-red-100 ml-2"
+                        title="Cancel Booking"
+                        onClick={() => handleCancelBooking(booking._id as string)}
+                      >
+                        <FaTrash className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  {booking.specialRequests && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <p className="text-xs text-gray-600">
                         <strong className="text-gray-900">Special Requests:</strong> {booking.specialRequests}
                       </p>
                     </div>
