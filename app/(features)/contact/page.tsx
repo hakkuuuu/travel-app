@@ -5,6 +5,13 @@ import ContactCards from '@/components/features/contact/ContactCards';
 import ContactForm from '@/components/features/contact/ContactForm';
 import ContactSidebar from '@/components/features/contact/ContactSidebar';
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 const contactCards = [
   {
     icon: 'email',
@@ -33,7 +40,7 @@ const businessHours = [
 ];
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
     subject: '',
@@ -43,8 +50,7 @@ export default function ContactPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (data: ContactFormData) => {
     setIsLoading(true);
     setError('');
     setSuccess(false);
@@ -55,16 +61,16 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
-      if (data.success) {
+      if (responseData.success) {
         setSuccess(true);
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        setError(data.error || 'Failed to send message');
+        setError(responseData.error || 'Failed to send message');
       }
     } catch (err) {
       setError('Failed to send message. Please try again.');
@@ -85,7 +91,7 @@ export default function ContactPage() {
       <ContactHero />
       
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <ContactCards contactCards={contactCards} />
           
@@ -94,12 +100,10 @@ export default function ContactPage() {
             {/* Contact Form */}
             <div className="lg:col-span-2">
               <ContactForm
-                formData={formData}
                 isLoading={isLoading}
                 success={success}
                 error={error}
                 onSubmit={handleSubmit}
-                onChange={handleChange}
               />
             </div>
             

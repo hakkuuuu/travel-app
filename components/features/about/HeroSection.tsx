@@ -14,18 +14,16 @@ export default function HeroSection() {
       
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 md:p-12 border border-white/20">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            About <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Travelis</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-700 mb-4 leading-relaxed">
-            We make adventure accessible to everyone
-          </p>
-          <p className="text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            Your trusted companion for discovering, booking, and sharing the world's best travel destinations. 
-            We believe every journey should be as unique as the traveler taking it.
-          </p>
-        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          About <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Travelis</span>
+        </h1>
+        <p className="text-lg md:text-xl text-white mb-4 leading-relaxed">
+          We make adventure accessible to everyone
+        </p>
+        <p className="text-white/90 leading-relaxed max-w-3xl mx-auto">
+          Your trusted companion for discovering, booking, and sharing the world's best travel destinations. 
+          We believe every journey should be as unique as the traveler taking it.
+        </p>
       </div>
     </section>
   );

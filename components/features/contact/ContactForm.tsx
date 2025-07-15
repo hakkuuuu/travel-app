@@ -1,6 +1,11 @@
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { contactFormSchema } from '@/lib/validation';
 import ErrorMessage from '@/components/ui/ErrorMessage';
 import LoadingButton from '@/components/ui/LoadingButton';
+import { useAuth } from '@/contexts/AuthContext';
+import FormField from '@/components/ui/FormField';
 
 interface FormData {
   name: string;
@@ -10,29 +15,46 @@ interface FormData {
 }
 
 interface ContactFormProps {
-  formData: FormData;
   isLoading: boolean;
   success: boolean;
   error: string;
-  onSubmit: (e: React.FormEvent) => void;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  onSubmit: (data: FormData) => void;
 }
 
 export default function ContactForm({
-  formData,
   isLoading,
   success,
   error,
-  onSubmit,
-  onChange
+  onSubmit
 }: ContactFormProps) {
+  const { user } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: yupResolver(contactFormSchema),
+    defaultValues: {
+      name: '',
+      email: user ? user.email || '' : '',
+      subject: '',
+      message: '',
+    },
+  });
+
+  const onFormSubmit = (data: FormData) => {
+    onSubmit(data);
+    reset();
+  };
+
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a message</h2>
         <p className="text-gray-600">We'll get back to you within 24 hours</p>
       </div>
-      
       {success && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-center">
@@ -43,51 +65,44 @@ export default function ContactForm({
           </div>
         </div>
       )}
-      
       {error && (
         <ErrorMessage
           message={error}
           variant="form"
         />
       )}
-      
-      <form onSubmit={onSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+          <FormField label="Name" htmlFor="contact-name" error={errors.name?.message} required>
             <input
+              id="contact-name"
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={onChange}
+              {...register('name')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
               placeholder="Your full name"
-              required
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? 'contact-name-error' : undefined}
             />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+          </FormField>
+          <FormField label="Email" htmlFor="contact-email" error={errors.email?.message} required>
             <input
+              id="contact-email"
               type="email"
-              name="email"
-              value={formData.email}
-              onChange={onChange}
+              {...register('email')}
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
               placeholder="you@email.com"
-              required
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'contact-email-error' : undefined}
             />
-          </div>
+          </FormField>
         </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+        <FormField label="Subject" htmlFor="contact-subject" error={errors.subject?.message} required>
           <select
-            name="subject"
-            value={formData.subject}
-            onChange={onChange}
+            id="contact-subject"
+            {...register('subject')}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-            required
+            aria-invalid={!!errors.subject}
+            aria-describedby={errors.subject ? 'contact-subject-error' : undefined}
           >
             <option value="">Select a subject</option>
             <option value="booking">Booking Assistance</option>
@@ -96,21 +111,18 @@ export default function ContactForm({
             <option value="partnership">Partnership Inquiry</option>
             <option value="other">Other</option>
           </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+        </FormField>
+        <FormField label="Message" htmlFor="contact-message" error={errors.message?.message} required>
           <textarea
-            name="message"
-            value={formData.message}
-            onChange={onChange}
+            id="contact-message"
+            {...register('message')}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
             rows={5}
             placeholder="Tell us how we can help you..."
-            required
+            aria-invalid={!!errors.message}
+            aria-describedby={errors.message ? 'contact-message-error' : undefined}
           />
-        </div>
-        
+        </FormField>
         <LoadingButton
           type="submit"
           loading={isLoading}

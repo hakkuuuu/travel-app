@@ -18,7 +18,7 @@ export default function ContactCards({ contactCards }: ContactCardsProps) {
         <a
           key={idx}
           href={card.action}
-          className="group bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-green-200 transition-all duration-300 text-center"
+          className="group bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center hover:shadow-xl hover:border-green-200 transition-all duration-300"
         >
           <div className="inline-flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg mb-4 group-hover:bg-green-100 transition-colors">
             <Icon name={card.icon} size="md" className="text-green-600" />

@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import Button from '@/components/ui/Button';
 import toast from 'react-hot-toast';
-import { validateEmail, validateRequired } from '@/lib/utils';
+import FormField from '@/components/ui/FormField';
+import { userFormSchema } from '@/lib/validation';
+import * as yup from 'yup';
 
 interface UserFormData {
   name: string;
@@ -43,12 +47,20 @@ const defaultForm: UserFormData = {
 };
 
 export default function UserForm({ onSubmit, onCancel, isLoading, error, success, editingUser }: UserFormProps) {
-  const [formData, setFormData] = useState<UserFormData>({ ...defaultForm });
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const schema = userFormSchema(!!editingUser) as yup.ObjectSchema<UserFormData>;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<UserFormData>({
+    resolver: yupResolver(schema),
+    defaultValues: defaultForm,
+  });
 
   useEffect(() => {
     if (editingUser) {
-      setFormData({
+      reset({
         name: editingUser.name || '',
         username: editingUser.username,
         email: editingUser.email,
@@ -58,215 +70,114 @@ export default function UserForm({ onSubmit, onCancel, isLoading, error, success
         avatar: editingUser.avatar || '/user.svg',
       });
     } else {
-      setFormData({ ...defaultForm });
+      reset(defaultForm);
     }
-    setValidationErrors({});
-  }, [editingUser]);
+  }, [editingUser, reset]);
 
-  const validateForm = (): boolean => {
-    const errors: Record<string, string> = {};
-
-    // Required field validation
-    if (!validateRequired(formData.name)) {
-      errors.name = 'Full name is required';
-    }
-
-    if (!validateRequired(formData.username)) {
-      errors.username = 'Username is required';
-    } else if (formData.username.length < 3) {
-      errors.username = 'Username must be at least 3 characters long';
-    }
-
-    if (!validateRequired(formData.email)) {
-      errors.email = 'Email is required';
-    } else if (!validateEmail(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
-    // Password validation for new users
-    if (!editingUser && !validateRequired(formData.password || '')) {
-      errors.password = 'Password is required for new users';
-    } else if (formData.password && formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters long';
-    }
-
-    // URL validation for avatar
-    if (formData.avatar && !formData.avatar.startsWith('/') && !formData.avatar.startsWith('http')) {
-      errors.avatar = 'Please enter a valid URL or path starting with / or http://';
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear validation error when user starts typing
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      toast.error('Please fix the validation errors before submitting');
-      return;
-    }
-
+  const onFormSubmit = async (data: UserFormData) => {
     try {
-      const submitData = { ...formData };
-      if (!submitData.password) delete submitData.password; // Don't send empty password
+      const submitData = { ...data };
+      if (submitData.password === '') delete submitData.password;
       await onSubmit(submitData);
       if (!editingUser) {
-        setFormData({ ...defaultForm });
+        reset(defaultForm);
       }
-      setValidationErrors({});
     } catch (error) {
       toast.error('Failed to save user. Please try again.');
     }
   };
 
-  const getInputClassName = (fieldName: string) => {
-    const baseClasses = "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200";
-    const hasError = validationErrors[fieldName];
-    
-    return `${baseClasses} ${
-      hasError 
-        ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-        : 'border-gray-300 focus:ring-blue-500 focus:border-transparent'
-    }`;
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       {/* Basic Information */}
       <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Full Name <span className="text-red-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            name="name" 
-            value={formData.name} 
-            onChange={handleChange} 
-            className={getInputClassName('name')}
+        <FormField label="Full Name" htmlFor="user-name" error={errors.name?.message} required>
+          <input
+            id="user-name"
+            type="text"
+            {...register('name')}
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200"
             placeholder="Enter full name"
-            required 
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'user-name-error' : undefined}
           />
-          {validationErrors.name && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.name}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Username <span className="text-red-500">*</span>
-          </label>
-          <input 
-            type="text" 
-            name="username" 
-            value={formData.username} 
-            onChange={handleChange} 
-            className={getInputClassName('username')}
+        </FormField>
+        <FormField label="Username" htmlFor="user-username" error={errors.username?.message} required>
+          <input
+            id="user-username"
+            type="text"
+            {...register('username')}
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200"
             placeholder="Choose a username"
-            required 
+            aria-invalid={!!errors.username}
+            aria-describedby={errors.username ? 'user-username-error' : undefined}
           />
-          {validationErrors.username && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.username}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email <span className="text-red-500">*</span>
-          </label>
-          <input 
-            type="email" 
-            name="email" 
-            value={formData.email} 
-            onChange={handleChange} 
-            className={getInputClassName('email')}
+        </FormField>
+        <FormField label="Email" htmlFor="user-email" error={errors.email?.message} required>
+          <input
+            id="user-email"
+            type="email"
+            {...register('email')}
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200"
             placeholder="user@example.com"
-            required 
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'user-email-error' : undefined}
           />
-          {validationErrors.email && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.email}</p>
-          )}
-        </div>
+        </FormField>
       </div>
 
       {/* Security & Role */}
       <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Password {editingUser && <span className="text-xs text-gray-500">(leave blank to keep unchanged)</span>}
-            {!editingUser && <span className="text-red-500">*</span>}
-          </label>
-          <input 
-            type="password" 
-            name="password" 
-            value={formData.password || ''} 
-            onChange={handleChange} 
-            className={getInputClassName('password')}
+        <FormField label="Password" htmlFor="user-password" error={errors.password?.message} required={!editingUser}>
+          <input
+            id="user-password"
+            type="password"
+            {...register('password')}
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200"
             placeholder={editingUser ? "Enter new password" : "Create a password"}
             autoComplete="new-password"
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'user-password-error' : undefined}
           />
-          {validationErrors.password && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.password}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-          <select 
-            name="role" 
-            value={formData.role} 
-            onChange={handleChange} 
+        </FormField>
+        <FormField label="Role" htmlFor="user-role">
+          <select
+            id="user-role"
+            {...register('role')}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
-        </div>
+        </FormField>
       </div>
 
       {/* Profile Information */}
       <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-          <textarea 
-            name="bio" 
-            value={formData.bio} 
-            onChange={handleChange} 
+        <FormField label="Bio" htmlFor="user-bio">
+          <textarea
+            id="user-bio"
+            {...register('bio')}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Tell us about yourself..."
             rows={2}
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Avatar URL</label>
-          <input 
-            type="text" 
-            name="avatar" 
-            value={formData.avatar} 
-            onChange={handleChange} 
-            className={getInputClassName('avatar')}
+        </FormField>
+        <FormField label="Avatar URL" htmlFor="user-avatar" error={errors.avatar?.message}>
+          <input
+            id="user-avatar"
+            type="text"
+            {...register('avatar')}
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200"
             placeholder="/user.svg or image URL"
+            aria-invalid={!!errors.avatar}
+            aria-describedby={errors.avatar ? 'user-avatar-error' : undefined}
           />
-          {validationErrors.avatar && (
-            <p className="text-red-500 text-xs mt-1">{validationErrors.avatar}</p>
-          )}
-        </div>
+        </FormField>
       </div>
 
       {/* Status Messages */}
-      {error && <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200">{error}</div>}
-      {/* Removed success message to avoid duplicate feedback */}
+      {error && <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200" role="alert">{error}</div>}
 
       {/* Actions */}
       <div className="flex justify-end gap-3 pt-4">

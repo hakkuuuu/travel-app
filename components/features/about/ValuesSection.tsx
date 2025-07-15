@@ -25,8 +25,8 @@ export default function ValuesSection({ values }: ValuesSectionProps) {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {values.map((value, index) => (
-            <div key={index} className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-50 rounded-full mb-4">
+            <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center hover:shadow-xl hover:border-green-200 transition-all duration-300 group">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-50 rounded-full mb-4 group-hover:bg-green-100 transition-colors">
                 <Icon name={value.icon} size="lg" className="text-green-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">{value.title}</h3>

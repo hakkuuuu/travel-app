@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
 import EmptyState from '@/components/ui/EmptyState';
 import { FaSearch, FaFilter, FaEye, FaCalendarAlt, FaUser, FaMapMarkerAlt, FaDollarSign } from 'react-icons/fa';
+import BookingDetailsModal from '@/components/admin/BookingDetailsModal';
 
 interface BookingTableProps {
   bookings: AdminBooking[];
@@ -16,10 +17,13 @@ export default function BookingTable({ bookings, isLoading }: BookingTableProps)
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'createdAt' | 'checkIn' | 'totalPrice'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedBooking, setSelectedBooking] = useState<AdminBooking | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Filter and sort bookings
   const filteredAndSortedBookings = useMemo(() => {
-    let filtered = bookings.filter(booking => {
+    const safeBookings = Array.isArray(bookings) ? bookings : [];
+    let filtered = safeBookings.filter(booking => {
       const matchesSearch = 
         booking.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         booking.destinationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -101,6 +105,16 @@ export default function BookingTable({ bookings, isLoading }: BookingTableProps)
       setSortBy(field);
       setSortOrder('desc');
     }
+  };
+
+  const handleViewBooking = (booking: AdminBooking) => {
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedBooking(null);
   };
 
   if (isLoading) {
@@ -208,6 +222,9 @@ export default function BookingTable({ bookings, isLoading }: BookingTableProps)
                     <span>Created</span>
                   </button>
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -239,6 +256,9 @@ export default function BookingTable({ bookings, isLoading }: BookingTableProps)
                         <p className="text-xs text-gray-500">
                           ID: {booking.bookingId} • {booking.guests} guest{booking.guests !== 1 ? 's' : ''}
                         </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {booking.userEmail}
+                        </p>
                       </div>
                     </div>
                   </td>
@@ -257,6 +277,11 @@ export default function BookingTable({ bookings, isLoading }: BookingTableProps)
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(booking.createdAt)}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <Button size="sm" variant="outline" onClick={() => handleViewBooking(booking)}>
+                      <FaEye className="inline mr-1" /> View
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -274,6 +299,13 @@ export default function BookingTable({ bookings, isLoading }: BookingTableProps)
           </div>
         )}
       </div>
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        booking={selectedBooking}
+      />
     </Card>
   );
 } 

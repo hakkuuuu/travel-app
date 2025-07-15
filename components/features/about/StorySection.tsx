@@ -20,20 +20,18 @@ export default function StorySection() {
             </p>
           </div>
           
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-            <div className="text-center">
-              <div className="text-4xl mb-4">🌍</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Join Our Community</h3>
-              <p className="text-gray-600 mb-4">
-                Connect with fellow travelers and share your adventures
-              </p>
-              <Link 
-                href="/destinations" 
-                className="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                Start Exploring
-              </Link>
-            </div>
+          <div className="text-center">
+            <div className="text-4xl mb-4">🌍</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">Join Our Community</h3>
+            <p className="text-gray-600 mb-4">
+              Connect with fellow travelers and share your adventures
+            </p>
+            <Link 
+              href="/destinations" 
+              className="inline-block bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Start Exploring
+            </Link>
           </div>
         </div>
       </div>

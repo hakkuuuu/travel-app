@@ -307,58 +307,51 @@ export default function ProfilePage() {
 
         {/* Tab Content */}
         {activeTab === 'profile' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Profile Section */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-50 to-green-50 px-6 py-4 border-b border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-                    <div className="flex space-x-2">
-                      {isEditing ? (
-                        <>
-                          <Button
-                            onClick={handleSaveClick}
-                            loading={saving}
-                            variant="success"
-                            icon={<FaSave className="w-4 h-4" />}
-                            disabled={!hasChanges}
-                          >
-                            Save Changes
-                          </Button>
-                          <Button
-                            onClick={handleCancelClick}
-                            variant="outline"
-                            icon={<FaTimes className="w-4 h-4" />}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      ) : (
-                        <Button
-                          onClick={() => setIsEditing(true)}
-                          variant="primary"
-                          icon={<FaEdit className="w-4 h-4" />}
-                        >
-                          Edit Profile
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <ProfileForm
-                    profile={profile}
-                    isEditing={isEditing}
-                    editForm={editForm}
-                    onFormChange={handleFormChange}
-                  />
-                </div>
+          <div className="space-y-8">
+            {/* Edit Controls */}
+            <div className="flex justify-end">
+              <div className="flex space-x-2">
+                {isEditing ? (
+                  <>
+                    <Button
+                      onClick={handleSaveClick}
+                      loading={saving}
+                      variant="success"
+                      icon={<FaSave className="w-4 h-4" />}
+                      disabled={!hasChanges}
+                    >
+                      Save Changes
+                    </Button>
+                    <Button
+                      onClick={handleCancelClick}
+                      variant="outline"
+                      icon={<FaTimes className="w-4 h-4" />}
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => setIsEditing(true)}
+                    variant="primary"
+                    icon={<FaEdit className="w-4 h-4" />}
+                  >
+                    Edit Profile
+                  </Button>
+                )}
               </div>
             </div>
-            
-            {/* Sidebar */}
-            <div className="space-y-6">
+
+            {/* Profile Form */}
+            <ProfileForm
+              profile={profile}
+              isEditing={isEditing}
+              editForm={editForm}
+              onFormChange={handleFormChange}
+            />
+
+            {/* Stats and Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <ProfileStats stats={stats} />
               <RecentActivityList recentActivity={recentActivity} />
             </div>

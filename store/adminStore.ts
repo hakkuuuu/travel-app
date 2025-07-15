@@ -295,8 +295,8 @@ export const useAdminStore = create<AdminState>()(
         set({ isLoading: true, error: null });
         
         try {
-          const response = await apiCall<AdminBooking[]>('/api/admin/bookings');
-          set({ bookings: response, isLoading: false });
+          const response = await apiCall<{ success: boolean; data: AdminBooking[] }>('/api/admin/bookings');
+          set({ bookings: Array.isArray(response.data) ? response.data : [], isLoading: false });
         } catch (error) {
           const errorMessage = 'Failed to fetch bookings';
           set({ error: errorMessage, isLoading: false });

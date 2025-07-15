@@ -222,8 +222,6 @@ function DestinationDetailContent({ params }: { params: Promise<{ id: string }> 
 
 export default function DestinationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   return (
-    <ProtectedRoute>
-      <DestinationDetailContent params={params} />
-    </ProtectedRoute>
+    <DestinationDetailContent params={params} />
   );
 } 

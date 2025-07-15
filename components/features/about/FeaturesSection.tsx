@@ -27,7 +27,7 @@ export default function FeaturesSection({ features }: FeaturesSectionProps) {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center hover:shadow-md hover:border-green-200 transition-all duration-300 group"
+              className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 text-center hover:shadow-xl hover:border-green-200 transition-all duration-300 group"
             >
               <div className="inline-flex items-center justify-center w-12 h-12 bg-green-50 rounded-lg mb-4 group-hover:bg-green-100 transition-colors">
                 <Icon name={feature.icon} size="md" className="text-green-600" />

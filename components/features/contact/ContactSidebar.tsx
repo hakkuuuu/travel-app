@@ -9,7 +9,7 @@ interface ContactSidebarProps {
 
 export default function ContactSidebar({ businessHours }: ContactSidebarProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
       <div className="mb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Get in touch</h3>
         <p className="text-gray-600">We're here to help with your travel plans</p>
